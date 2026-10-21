@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>茶智管 · 安吉智慧茶园精准管理与产业服务系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Serif+SC:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&family=Quicksand:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&family=Bodoni+Moda:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --primary:#1a7a4c;--primary-light:#e8f5ee;--primary-dark:#0f4f31;
+            --primary-gradient:linear-gradient(135deg,#1a7a4c 0%,#2d9b6e 100%);
+            --accent-warm:#e88a3a;--bg-body:#f1f5f9;--bg-card:#fff;
+            --text-primary:#0b1e28;--text-secondary:#3d5567;--text-muted:#7a8f9e;
+            --border-light:#e2e8f0;--shadow-card:0 4px 16px rgba(0,0,0,0.06);
+            --radius-card:18px;--radius-btn:40px;--sidebar-width:230px;
+            --font:'Inter',-apple-system,sans-serif;
+            --danger:#d45a5a;--warning:#e8a838;--success:#3aaf6a;--info:#4a8ecf;
+        }
+        body{font-family:var(--font);background:var(--bg-body);color:var(--text-primary);display:flex;min-height:100vh;overflow:hidden}
+        /* ====== Sidebar ====== */
+        .sidebar{width:var(--sidebar-width);background:var(--text-primary);color:#fff;display:flex;flex-direction:column;flex-shrink:0;padding:24px 0 20px 0;height:100vh;overflow-y:auto;border-right:1px solid rgba(255,255,255,0.06)}
+        .sidebar-brand{padding:0 20px 24px 20px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:16px;display:flex;align-items:center;gap:12px}
+        .sidebar-brand .logo-icon{width:40px;height:40px;background:var(--primary-gradient);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;flex-shrink:0}
+        .sidebar-brand .brand-text{font-weight:700;font-size:20px;line-height:1.1}
+        .sidebar-brand .brand-text span{color:#6bc7a0}
+        .sidebar-brand .brand-sub{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-top:3px}
+        .nav-section{padding:0 12px;flex:1}
+        .nav-label{font-size:10px;text-transform:uppercase;color:rgba(255,255,255,0.25);padding:8px 12px 6px 12px;font-weight:600}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;margin:2px 0;border-radius:12px;cursor:pointer;transition:all .25s ease;color:rgba(255,255,255,0.65);font-weight:500;font-size:14px}
+        .nav-item:hover{background:rgba(255,255,255,0.08);color:#fff}
+        .nav-item.active{background:var(--primary-gradient);color:#fff;box-shadow:0 4px 14px rgba(26,122,76,0.35)}
+        .nav-item i{width:20px;text-align:center}
+        .nav-item .badge-dot{width:8px;height:8px;background:#f1c40f;border-radius:50%;margin-left:auto;animation:pulse 2s infinite}
+        .nav-item .badge-count{min-width:20px;height:18px;padding:0 6px;background:rgba(255,255,255,0.14);border-radius:9px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;color:#fff}
+        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+        .sidebar-footer{padding:16px 20px 0 20px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:rgba(255,255,255,0.3);text-align:center}
+        /* ====== Main ====== */
+        .main{flex:1;display:flex;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg-body)}
+        .topbar{background:rgba(255,255,255,0.85);backdrop-filter:blur(12px);padding:14px 32px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border-light);flex-shrink:0}
+        .topbar-left .page-title{font-size:20px;font-weight:700}
+        .topbar-left .page-title span{color:var(--primary)}
+        .topbar-right{display:flex;align-items:center;gap:16px}
+        .topbar-right .time{font-size:13px;color:var(--text-secondary);background:rgba(0,0,0,0.04);padding:6px 14px;border-radius:20px;display:flex;align-items:center;gap:8px}
+        .topbar-right .badge-status{font-size:12px;color:var(--success);background:#e3f5ec;padding:6px 14px;border-radius:20px;display:flex;align-items:center;gap:6px}
+        .content{flex:1;overflow-y:auto;padding:28px 32px 40px}
+        .page{display:none;animation:fadeUp .35s ease}
+        .page.active{display:block}
+        @keyframes fadeUp{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:translateY(0)}}
+        .page-header{margin-bottom:24px}
+        .page-header h1{font-size:24px;font-weight:700;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+        .page-header h1 i{color:var(--primary)}
+        .page-header .sub{color:var(--text-secondary);font-size:14px;margin-top:6px;border-left:4px solid var(--primary);padding-left:14px;line-height:1.5}
+        .page-header .sub .highlight{background:var(--primary-light);color:var(--primary-dark);padding:1px 10px;border-radius:20px;font-weight:600;font-size:12px}
+        .location-bar{background:var(--primary-light);padding:7px 16px;border-radius:30px;display:inline-flex;align-items:center;gap:10px;font-size:12px;font-weight:500;color:var(--primary-dark);margin-top:10px;border:1px solid rgba(26,122,76,0.15)}
+        .location-bar .loc-spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(26,122,76,0.2);border-top:2px solid var(--primary);border-radius:50%;animation:spin .8s linear infinite}
+        @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+        /* ====== Grid & Cards ====== */
+        .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:24px}
+        .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:24px}
+        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+        @media(max-width:1024px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:1fr 1fr}}
+        @media(max-width:700px){.grid-4,.grid-3,.grid-2{grid-template-columns:1fr}.content{padding:16px}}
+        /* ====== 顶部官网导航条 ====== */
+        .nav-bar{position:relative;gap:18px;padding:10px 24px;z-index:100}
+        .nav-logo{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0}
+        .nav-logo .logo-icon{width:38px;height:38px;background:var(--primary-gradient);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff}
+        .nav-logo-text{font-size:19px;font-weight:800;letter-spacing:1px;color:var(--text-primary)}
+        .nav-logo-text span{color:var(--primary)}
+        .top-nav{display:flex;align-items:center;gap:2px;flex:1;min-width:0}
+        .nav-link{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text-secondary);transition:all .2s ease;white-space:nowrap}
+        .nav-link:hover{background:var(--primary-light);color:var(--primary)}
+        .nav-link.active{background:var(--primary-light);color:var(--primary);font-weight:600}
+        .nav-link i{width:16px;text-align:center}
+        .nav-link .badge-count{min-width:19px;height:17px;padding:0 5px;background:var(--primary);border-radius:9px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:auto;color:#fff}
+        .nav-group{position:relative}
+        .nav-group-title{display:flex;align-items:center;gap:7px;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text-secondary);transition:all .2s ease;white-space:nowrap;user-select:none}
+        .nav-group-title:hover{background:var(--primary-light);color:var(--primary)}
+        .nav-group-title .caret{font-size:10px;transition:transform .25s ease;margin-left:2px}
+        .nav-group:hover .nav-group-title,.nav-group.open .nav-group-title{background:var(--primary-light);color:var(--primary)}
+        .nav-group:hover .nav-group-title .caret,.nav-group.open .nav-group-title .caret{transform:rotate(180deg)}
+        .nav-dropdown{position:absolute;top:calc(100% + 8px);left:0;min-width:180px;background:var(--bg-card);border:1px solid var(--border-light);border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,0.12);padding:6px;display:none;flex-direction:column;animation:fadeUp .25s ease;z-index:120}
+        .nav-group:hover .nav-dropdown,.nav-group.open .nav-dropdown{display:flex}
+        .nav-dropdown .nav-link{padding:9px 12px;border-radius:8px}
+        .nav-hamburger{display:none;background:none;border:none;font-size:19px;color:var(--text-primary);cursor:pointer;padding:6px 10px;border-radius:8px;transition:background .2s ease}
+        .nav-hamburger:hover{background:var(--primary-light);color:var(--primary)}
+        @media(max-width:900px){
+            .nav-bar{flex-wrap:wrap}
+            .top-nav{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg-card);border-bottom:1px solid var(--border-light);box-shadow:0 12px 32px rgba(0,0,0,0.10);flex-direction:column;align-items:stretch;padding:10px 14px;gap:2px;z-index:110}
+            body.nav-open .top-nav{display:flex}
+            .nav-link{padding:11px 12px}
+            .nav-group,.nav-group.open{width:100%}
+            .nav-group-title{padding:11px 12px;justify-content:space-between}
+            .nav-dropdown{position:static;display:none;box-shadow:none;border:none;padding:0 0 0 10px;min-width:0}
+            .nav-group.open .nav-dropdown{display:flex}
+            .nav-hamburger{display:inline-flex;align-items:center}
+        }
+        .card{background:var(--bg-card);border-radius:var(--radius-card);padding:20px 22px;box-shadow:var(--shadow-card);border:1px solid var(--border-light);transition:all .25s ease}
+        .card:hover{box-shadow:0 12px 32px rgba(0,0,0,0.10)}
+        .card .card-label{font-size:13px;color:var(--text-muted);font-weight:500;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+        .card .card-value{font-size:30px;font-weight:700;margin:6px 0 4px 0}
+        .card .card-change{font-size:12px;padding:2px 12px;border-radius:30px;display:inline-block;font-weight:500}
+        .card .card-change.up{background:#e3f5ec;color:#1a7a4c}
+        .card .card-change.down{background:#fde8e8;color:#c0392b}
+        .card .card-change.warn{background:#fef1e6;color:#c96f2e}
+        .card .card-change.neutral{background:#eef2f6;color:var(--text-secondary)}
+        .card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+        .card-header h3{font-size:15px;font-weight:600;color:var(--text-primary)}
+        .card-header h3 i{color:var(--primary);margin-right:6px}
+        .data-tag{font-size:11px;color:var(--text-muted);background:#eef2f6;padding:2px 10px;border-radius:30px;display:inline-block;margin-left:4px}
+        .data-tag.real{background:#e3f5ec;color:#1a7a4c}
+        .data-tag.sim{background:#fef1e6;color:#c96f2e}
+        .badge{font-size:12px;padding:4px 12px;border-radius:20px;background:var(--primary-light);color:var(--primary);font-weight:500}
+        .alert-bar{background:#fef9f0;border-left:5px solid var(--accent-warm);padding:14px 20px;border-radius:14px;margin-bottom:24px;display:flex;align-items:flex-start;gap:14px;border:1px solid #fae3cd}
+        .alert-bar .alert-icon{color:var(--accent-warm);font-size:20px;margin-top:2px;flex-shrink:0}
+        .alert-bar .alert-content{flex:1;font-size:14px;line-height:1.6;color:#5a3f28}
+        .alert-bar .alert-content strong{color:#8a5a2a}
+        .alert-bar .alert-tag{background:#c0392b;color:#fff;padding:2px 14px;border-radius:30px;font-size:12px;font-weight:600;flex-shrink:0;margin-left:auto}
+        /* ====== Zone Cards ====== */
+        .zone-card{background:var(--bg-card);border-radius:var(--radius-card);padding:22px 18px;text-align:center;border:1px solid var(--border-light);box-shadow:var(--shadow-card);cursor:pointer;transition:all .25s ease}
+        .zone-card:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(0,0,0,0.10)}
+        .zone-card .zone-name{font-size:17px;font-weight:700}
+        .zone-card .zone-sub{font-size:12px;color:var(--text-muted);margin-top:2px}
+        .status-badge{display:inline-block;padding:4px 16px;border-radius:30px;font-size:12px;font-weight:600;margin:10px 0 8px 0}
+        .status-badge.normal{background:#e3f5ec;color:#1a7a4c}
+        .status-badge.water{background:#fef1e6;color:#c96f2e}
+        .status-badge.pest{background:#fde8e8;color:#c0392b}
+        .status-badge.warn{background:#fef1e6;color:#c96f2e}
+        .zone-card .zone-data{font-size:13px;color:var(--text-secondary);margin-top:6px}
+        .zone-card .click-hint{font-size:12px;color:var(--primary);margin-top:10px;font-weight:500}
+        /* ====== AI Upload ====== */
+        .upload-drop{border:2px dashed #cbd5e1;border-radius:18px;padding:40px 20px;text-align:center;background:#fafcff;cursor:pointer;transition:all .25s ease}
+        .upload-drop:hover{border-color:var(--primary);background:var(--primary-light)}
+        .upload-drop.dragover{border-color:var(--primary);background:var(--primary-light)}
+        .upload-drop i{font-size:42px;color:#8baa9a;margin-bottom:10px}
+        .upload-drop p{font-weight:500;font-size:15px;color:var(--text-secondary)}
+        .upload-drop .hint{font-size:12px;color:var(--text-muted);margin-top:4px}
+        .preview-img{max-width:180px;max-height:180px;border-radius:12px;object-fit:cover;border:2px solid var(--border-light);margin:8px 0}
+        .result-panel{margin-top:20px;background:var(--bg-card);border-radius:var(--radius-card);padding:22px;border:1px solid var(--border-light);display:none;box-shadow:var(--shadow-card)}
+        .result-panel.show{display:block;animation:fadeUp .35s ease}
+        .result-panel .result-flex{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+        .result-panel .result-img{width:130px;height:130px;background:#eef3f7;border-radius:14px;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .result-panel .result-img img{width:100%;height:100%;object-fit:cover}
+        .result-panel .result-info{flex:1;min-width:200px}
+        .result-panel .result-info .disease-name{font-size:20px;font-weight:700}
+        .risk-tag{display:inline-block;padding:3px 14px;border-radius:30px;font-weight:600;font-size:13px;margin:6px 0 10px 0}
+        .risk-tag.high{background:#fde8e8;color:#c0392b}
+        .risk-tag.mid{background:#fef1e6;color:#c96f2e}
+        .risk-tag.low{background:#e3f5ec;color:#1a7a4c}
+        .advice-box{background:#f6f9fc;padding:12px 16px;border-radius:10px;font-size:13px;line-height:1.7;border-left:4px solid var(--primary)}
+        .history-list{margin-top:16px;border-top:1px solid var(--border-light);padding-top:14px}
+        .history-list .history-item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f3f7;font-size:13px;color:var(--text-secondary)}
+        .history-list .history-item:last-child{border-bottom:none}
+        /* ====== Slider Decision ====== */
+        .slider-group{display:grid;grid-template-columns:1fr 1fr;gap:16px 28px;margin-bottom:18px}
+        @media(max-width:600px){.slider-group{grid-template-columns:1fr}}
+        .slider-item label{font-weight:600;font-size:13px;color:var(--text-secondary);display:flex;justify-content:space-between}
+        .slider-item input[type=range]{width:100%;margin:6px 0 2px 0;accent-color:var(--primary);height:6px;border-radius:10px;background:#e2e8f0}
+        .slider-item input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;background:var(--primary-gradient);border-radius:50%;cursor:pointer}
+        .slider-item .val{font-weight:700;min-width:36px;display:inline-block;text-align:right;color:var(--text-primary)}
+        .btn-primary{background:var(--primary-gradient);color:#fff;border:none;padding:11px 30px;border-radius:var(--radius-btn);font-weight:600;font-size:14px;cursor:pointer;transition:all .25s ease;box-shadow:0 4px 16px rgba(26,122,76,0.25);display:inline-flex;align-items:center;gap:10px}
+        .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(26,122,76,0.35)}
+        .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+        .btn-secondary{background:var(--border-light);color:var(--text-secondary);border:none;padding:10px 24px;border-radius:var(--radius-btn);font-weight:500;cursor:pointer;transition:all .25s ease;font-size:13px;display:inline-flex;align-items:center;gap:8px}
+        .btn-secondary:hover{background:#d0d8e0}
+        .btn-outline{background:transparent;border:2px solid var(--primary);color:var(--primary);padding:8px 22px;border-radius:var(--radius-btn);font-weight:600;cursor:pointer;font-size:13px;transition:all .25s ease;display:inline-flex;align-items:center;gap:8px}
+        .btn-outline:hover{background:var(--primary);color:#fff}
+        .btn-sm{padding:6px 16px;font-size:12px}
+        .btn-danger{background:var(--danger)!important}
+        .decision-output{margin-top:20px;background:var(--bg-card);border-radius:var(--radius-card);padding:22px;border:1px solid var(--border-light);display:none;box-shadow:var(--shadow-card)}
+        .decision-output.show{display:block;animation:fadeUp .35s ease}
+        .decision-output .advice-text{background:#f6fafd;padding:14px 18px;border-radius:12px;white-space:pre-wrap;line-height:1.8;font-size:14px}
+        .decision-output .risk-summary{margin-top:14px;padding:12px 18px;background:#fef9f0;border-radius:12px;border-left:4px solid var(--accent-warm);font-size:14px}
+        .loading-spinner{display:inline-block;width:16px;height:16px;border:3px solid #e2e8f0;border-top:3px solid #fff;border-radius:50%;animation:spin .8s linear infinite}
+        /* ====== Report Table ====== */
+        .report-table-wrap{overflow-x:auto}
+        .report-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13px}
+        .report-table th{text-align:left;padding:11px 10px;border-bottom:2px solid var(--border-light);font-weight:600;color:var(--text-secondary)}
+        .report-table td{padding:10px;border-bottom:1px solid #f0f3f7}
+        .report-table tr:last-child td{border-bottom:none}
+        .report-summary{margin-top:18px;background:#f4f9fc;padding:14px 18px;border-radius:12px;font-size:13px;color:var(--text-secondary);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
+        /* ====== Eco & Industry ====== */
+        .eco-card{background:var(--bg-card);border-radius:var(--radius-card);padding:20px 22px;border:1px solid var(--border-light);box-shadow:var(--shadow-card);transition:all .25s ease}
+        .eco-card:hover{box-shadow:0 12px 32px rgba(0,0,0,0.10)}
+        .eco-card .eco-title{font-weight:600;font-size:15px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+        .eco-card .eco-title i{color:var(--primary)}
+        .eco-card .eco-value{font-size:26px;font-weight:700}
+        .eco-card .eco-desc{font-size:12px;color:var(--text-muted);margin-top:2px}
+        .qr-placeholder{width:80px;height:80px;background:#eef2f6;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;color:var(--text-muted);border:2px dashed #cbd5e1}
+        .tag{display:inline-block;padding:2px 12px;border-radius:20px;font-size:11px;font-weight:600}
+        .tag.green{background:#e3f5ec;color:#1a7a4c}
+        .tag.orange{background:#fef1e6;color:#c96f2e}
+        .tag.blue{background:#e3ecf5;color:#2c7fb8}
+        .tag.red{background:#fde8e8;color:#c0392b}
+        .flex-between{display:flex;justify-content:space-between;align-items:center}
+        .text-muted{color:var(--text-muted)}
+        .text-sm{font-size:13px}
+        /* ====== 官网风格 Hero ====== */
+        .hero{position:relative;border-radius:24px;overflow:hidden;padding:44px 44px 40px;margin-bottom:22px;color:#fff;background:linear-gradient(135deg,var(--primary-dark) 0%,var(--primary) 55%,var(--primary-light) 130%);box-shadow:0 12px 40px rgba(0,0,0,0.12);display:grid;grid-template-columns:1.25fr 1fr;gap:36px;align-items:center}
+        @media(max-width:800px){.hero{grid-template-columns:1fr;padding:32px 24px}}
+        .hero::before{content:'';position:absolute;right:-90px;top:-90px;width:300px;height:300px;border-radius:50%;background:rgba(255,255,255,0.08)}
+        .hero::after{content:'';position:absolute;right:90px;bottom:-120px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,0.05)}
+        .hero-vert{position:absolute;right:24px;top:50%;transform:translateY(-50%) rotate(180deg);writing-mode:vertical-rl;font-size:120px;font-weight:900;letter-spacing:8px;color:rgba(255,255,255,0.06);line-height:1;pointer-events:none;user-select:none}
+        @media(max-width:800px){.hero-vert{display:none}}
+        .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:2px;padding:6px 16px;border-radius:30px;background:rgba(255,255,255,0.16);backdrop-filter:blur(4px);margin-bottom:18px}
+        .hero-title{font-size:34px;font-weight:800;line-height:1.25;letter-spacing:0.5px;margin-bottom:14px}
+        @media(max-width:800px){.hero-title{font-size:26px}}
+        .hero-title em{font-style:normal;color:rgba(255,255,255,0.75);font-weight:600}
+        .hero-sub{font-size:14px;line-height:1.9;color:rgba(255,255,255,0.82);max-width:520px;margin-bottom:26px}
+        .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+        .hero-cta .btn-white{background:#fff;color:var(--primary-dark);border:none;padding:11px 26px;border-radius:40px;font-weight:700;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:all .25s ease;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+        .hero-cta .btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.2)}
+        .hero-cta .btn-ghost{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.6);padding:11px 26px;border-radius:40px;font-weight:600;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:all .25s ease}
+        .hero-cta .btn-ghost:hover{background:rgba(255,255,255,0.12);border-color:#fff}
+        .hero-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:relative;z-index:1}
+        .hero-metric{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);border-radius:16px;padding:16px 18px;backdrop-filter:blur(6px)}
+        .hero-metric .hm-label{font-size:12px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:7px;margin-bottom:6px}
+        .hero-metric .hm-value{font-size:24px;font-weight:800;letter-spacing:-0.5px}
+        .hero-metric .hm-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:rgba(255,255,255,0.2);margin-left:6px;vertical-align:2px}
+        .hero-metric .hm-change{font-size:11px;color:rgba(255,255,255,0.7);margin-top:2px;display:block}
+        .hero .data-tag{background:rgba(255,255,255,0.22)!important;color:#fff!important;border-radius:20px}
+        .hero .card-change{background:rgba(255,255,255,0.22);color:rgba(255,255,255,0.92);font-size:10px;padding:1px 8px;border-radius:20px;display:inline-block;margin-top:2px}
+        .hero .loc-spinner{display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-1px;margin-right:4px}
+        /* ====== 统计条 ====== */
+        .stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+        @media(max-width:700px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+        .stat-item{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-card);padding:16px 20px;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow-card)}
+        .stat-item .si-icon{width:44px;height:44px;border-radius:12px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+        .stat-item .si-num{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text-primary)}
+        .stat-item .si-label{font-size:12px;color:var(--text-muted);margin-top:1px}
+        /* ====== 特色板块 ====== */
+        .feature-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}
+        @media(max-width:1000px){.feature-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:600px){.feature-grid{grid-template-columns:1fr}}
+        .feature-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-card);padding:22px 20px;transition:all .25s ease;box-shadow:var(--shadow-card);position:relative;overflow:hidden}
+        .feature-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.10)}
+        .feature-card .fc-icon{width:46px;height:46px;border-radius:14px;background:var(--primary-gradient);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px;box-shadow:0 4px 14px rgba(26,122,76,0.25)}
+        .feature-card .fc-title{font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:6px}
+        .feature-card .fc-desc{font-size:12px;color:var(--text-muted);line-height:1.7}
+        .feature-card .fc-line{position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary-gradient);opacity:0;transition:opacity .3s ease}
+        .feature-card:hover .fc-line{opacity:1}
+        /* ====== Workbench / Function Hub ====== */
+        .workbench{margin-top:8px}
+        .section-title{display:flex;align-items:center;gap:10px;margin:0 0 14px 2px;font-size:15px;font-weight:700;color:var(--text-primary)}
+        .section-title i{color:var(--primary)}
+        .section-title .group-tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark)}
+        .section-title .sub-line{flex:1;height:1px;background:var(--border-light);margin:0 4px}
+        .func-group{margin-bottom:22px}
+        .func-group:last-child{margin-bottom:0}
+        .func-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+        @media(max-width:900px){.func-grid{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:600px){.func-grid{grid-template-columns:1fr}}
+        .func-card{position:relative;background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-card);padding:18px 20px;cursor:pointer;transition:all .25s ease;overflow:hidden;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-card)}
+        .func-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.10);border-color:var(--primary)}
+        .func-card::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--primary-gradient);transform:scaleY(0);transform-origin:top;transition:transform .3s ease}
+        .func-card:hover::after{transform:scaleY(1)}
+        .func-card .func-top{display:flex;align-items:center;justify-content:space-between}
+        .func-card .func-icon{width:42px;height:42px;border-radius:12px;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0}
+        .func-card .func-stat{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--primary-light);color:var(--primary-dark);white-space:nowrap}
+        .func-card .func-title{font-size:15px;font-weight:700;color:var(--text-primary);margin-top:2px}
+        .func-card .func-desc{font-size:12px;color:var(--text-muted);line-height:1.6}
+        .func-card .func-foot{display:flex;align-items:center;justify-content:space-between;margin-top:2px}
+        .func-card .func-go{font-size:12px;font-weight:600;color:var(--primary);display:flex;align-items:center;gap:5px}
+        .func-card .func-go i{transition:transform .25s ease}
+        .func-card:hover .func-go i{transform:translateX(4px)}
+        /* ====== Sensor Table ====== */
+        .sensor-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:4px}
+        .sensor-table th{text-align:left;padding:9px 10px;border-bottom:2px solid var(--border-light);font-weight:600;color:var(--text-secondary);font-size:12px}
+        .sensor-table td{padding:9px 10px;border-bottom:1px solid #f0f3f7}
+        .sensor-table tr:last-child td{border-bottom:none}
+        .sensor-table tr:hover td{background:var(--primary-light)}
+        .sensor-batt{display:inline-flex;align-items:center;gap:4px;font-size:12px}
+        .sensor-batt .batt-bar{width:26px;height:11px;border:1px solid var(--text-muted);border-radius:2px;position:relative;overflow:hidden}
+        .sensor-batt .batt-bar i{display:block;height:100%;background:var(--primary)}
+        .sensor-batt.low .batt-bar i{background:#e67e22}
+        .sensor-batt.off .batt-bar i{background:#bbb;background-image:linear-gradient(45deg,transparent 45%,#fff 45%,#fff 55%,transparent 55%)}
+        .status-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+        .status-dot.online{background:var(--primary)}
+        .status-dot.lowbattery{background:#e67e22}
+        .status-dot.offline{background:#bbb}
+        /* ====== Alert Timeline ====== */
+        .timeline{position:relative;padding-left:22px;margin-top:6px}
+        .timeline::before{content:'';position:absolute;left:6px;top:6px;bottom:6px;width:2px;background:var(--border-light)}
+        .tl-item{position:relative;padding:0 0 16px 6px}
+        .tl-item:last-child{padding-bottom:0}
+        .tl-item::before{content:'';position:absolute;left:-19px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--primary);border:2px solid var(--bg-card)}
+        .tl-item.water::before{background:#2c7fb8}
+        .tl-item.pest::before{background:#c0392b}
+        .tl-item.warn::before{background:#e67e22}
+        .tl-item.info::before{background:var(--text-muted)}
+        .tl-time{font-size:11px;color:var(--text-muted);font-weight:600}
+        .tl-zone{font-size:13px;font-weight:600;color:var(--text-primary);margin:1px 0 2px}
+        .tl-text{font-size:12px;color:var(--text-secondary);line-height:1.5}
+        /* ====== Decision Presets ====== */
+        .preset-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+        @media(max-width:700px){.preset-grid{grid-template-columns:repeat(2,1fr)}}
+        .preset-btn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border:1px solid var(--border-light);border-radius:12px;background:var(--bg-card);cursor:pointer;transition:all .25s ease;text-align:center}
+        .preset-btn:hover{border-color:var(--primary);background:var(--primary-light);transform:translateY(-2px)}
+        .preset-btn i{font-size:20px;color:var(--primary)}
+        .preset-btn .pn{font-size:12px;font-weight:600;color:var(--text-primary)}
+        .preset-btn .pp{font-size:10px;color:var(--text-muted)}
+        /* ====== History list (decision/report) ====== */
+        .mini-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:2px}
+        .mini-list li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;transition:background .2s ease}
+        .mini-list li:hover{background:var(--primary-light)}
+        .mini-list .ml-time{font-size:11px;color:var(--text-muted);white-space:nowrap}
+        .mini-list .ml-main{flex:1;min-width:0}
+        .mini-list .ml-scene{font-weight:600;color:var(--text-primary)}
+        .mini-list .ml-result{font-size:12px;color:var(--text-secondary);margin-top:1px}
+        .risk-pill{font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap}
+        .risk-pill.高{background:#fde8e8;color:#c0392b}
+        .risk-pill.中{background:#fef1e6;color:#c96f2e}
+        .risk-pill.低{background:#e3f5ec;color:#1a7a4c}
+        /* ====== Report Tabs ====== */
+        .tab-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+        .tab{padding:8px 18px;border:1px solid var(--border-light);border-radius:30px;background:var(--bg-card);font-size:13px;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all .25s ease}
+        .tab:hover{border-color:var(--primary);color:var(--primary)}
+        .tab.active{background:var(--primary-gradient);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(26,122,76,0.25)}
+        /* ====== Disease Library ====== */
+        .disease-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+        @media(max-width:700px){.disease-grid{grid-template-columns:1fr}}
+        .disease-card{border:1px solid var(--border-light);border-radius:12px;padding:14px 16px;background:var(--bg-card);transition:all .25s ease}
+        .disease-card:hover{border-color:var(--primary);box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+        .disease-card .dc-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+        .disease-card .dc-name{font-weight:700;font-size:14px;color:var(--text-primary)}
+        .disease-card .dc-row{font-size:12px;color:var(--text-secondary);line-height:1.6;margin-top:3px}
+        .disease-card .dc-row b{color:var(--text-primary)}
+        /* ====== 设备管理 ====== */
+        .device-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+        .device-card{background:var(--bg-card);border:1px solid var(--border-light);border-radius:var(--radius-card);padding:18px 20px;box-shadow:var(--shadow-card);transition:all .25s ease}
+        .device-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.10);transform:translateY(-2px)}
+        .device-card .device-top{display:flex;justify-content:space-between;align-items:flex-start}
+        .device-card .device-name{font-weight:600;font-size:15px}
+        .device-card .device-type{font-size:12px;color:var(--text-muted);margin-top:2px}
+        .device-card .device-status{font-size:11px;font-weight:600;padding:3px 12px;border-radius:30px;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
+        .device-card .device-status.online{background:#e3f5ec;color:#1a7a4c}
+        .device-card .device-status.offline{background:#eef2f6;color:var(--text-muted)}
+        .device-card .device-status.warning{background:#fef1e6;color:#c96f2e}
+        .device-card .device-meta{font-size:12px;color:var(--text-secondary);margin-top:10px;line-height:1.9}
+        .device-card .device-meta i{color:var(--text-muted);width:16px}
+        /* ====== 图表 ====== */
+        .chart-container{position:relative;height:300px;width:100%}
+        /* ====== 农事日历 ====== */
+        .calendar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+        .calendar-header .month-year{font-size:20px;font-weight:700}
+        .calendar-header .nav-btn{background:none;border:none;font-size:20px;color:var(--text-secondary);cursor:pointer;padding:4px 12px;border-radius:8px;transition:all .2s}
+        .calendar-header .nav-btn:hover{background:var(--primary-light);color:var(--primary)}
+        .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+        .calendar-grid .day-header{text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);padding:8px 0}
+        .calendar-grid .day-cell{aspect-ratio:1;border-radius:10px;background:var(--bg-card);border:1px solid var(--border-light);padding:6px 4px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;font-size:13px;font-weight:500;min-height:56px;position:relative}
+        .calendar-grid .day-cell:hover{background:var(--primary-light);border-color:var(--primary)}
+        .calendar-grid .day-cell.other-month{color:var(--text-muted);opacity:0.4}
+        .calendar-grid .day-cell.today{border-color:var(--primary);background:var(--primary-light);font-weight:700}
+        .calendar-grid .day-cell .task-dots{display:flex;gap:3px;margin-top:4px;flex-wrap:wrap;justify-content:center}
+        .calendar-grid .day-cell .task-dot{width:6px;height:6px;border-radius:50%}
+        .calendar-grid .day-cell .task-dot.irrigation{background:#4a8ecf}
+        .calendar-grid .day-cell .task-dot.fertilize{background:#e8a838}
+        .calendar-grid .day-cell .task-dot.pesticide{background:#d45a5a}
+        .calendar-grid .day-cell .task-dot.harvest{background:#3aaf6a}
+        .calendar-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding:12px 16px;background:var(--bg-body);border-radius:12px;font-size:12px;align-items:center}
+        .calendar-legend .legend-item{display:flex;align-items:center;gap:6px}
+        .calendar-legend .legend-dot{width:10px;height:10px;border-radius:50%}
+        .calendar-legend .legend-dot.irrigation{background:#4a8ecf}
+        .calendar-legend .legend-dot.fertilize{background:#e8a838}
+        .calendar-legend .legend-dot.pesticide{background:#d45a5a}
+        .calendar-legend .legend-dot.harvest{background:#3aaf6a}
+        /* ====== Settings ====== */
+        .settings-section{max-width:820px;margin:0 auto}
+        .settings-group{display:flex;flex-direction:column;gap:14px}
+        .settings-group .field{display:flex;flex-direction:column;gap:4px}
+        .settings-group .field label{font-size:13px;font-weight:600;color:var(--text-primary);display:flex;align-items:center;gap:8px}
+        .settings-group .field input{padding:10px 14px;border:1px solid var(--border-light);border-radius:10px;font-size:14px;background:#fff}
+        .settings-group .field input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,122,76,0.12)}
+        .settings-status{display:flex;align-items:center;gap:10px;padding:12px 16px;border-radius:10px;background:#f0f8f0;border:1px solid #d0e8d0;font-size:14px;color:var(--primary-dark)}
+        .settings-status .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+        .settings-status .dot.green{background:var(--success)}
+        .settings-status .dot.gray{background:var(--text-muted)}
+        /* ====== Toast ====== */
+        .toast{position:fixed;bottom:30px;right:30px;background:var(--text-primary);color:#fff;padding:13px 22px;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,0.25);font-size:14px;display:flex;align-items:center;gap:12px;z-index:999;transform:translateY(80px);opacity:0;transition:all .4s ease;pointer-events:none}
+        .toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
+        .toast i{font-size:18px}
+        .shimmer{background:linear-gradient(90deg,#eef2f0 25%,#e2eee2 50%,#eef2f0 75%);background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:8px}
+        @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        .hidden{display:none!important}
+        /* ====== Theme Grid ====== */
+        .theme-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+        @media(max-width:900px){.theme-grid{grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:600px){.theme-grid{grid-template-columns:repeat(2,1fr)}}
+        .theme-card{cursor:pointer;border-radius:14px;overflow:hidden;border:2px solid var(--border-light);transition:all .25s ease;background:var(--bg-card);position:relative}
+        .theme-card:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(0,0,0,0.12)}
+        .theme-card.active{border-color:var(--primary);box-shadow:0 0 0 3px rgba(26,122,76,0.18),0 8px 22px rgba(0,0,0,0.12)}
+        .theme-card.active::after{content:"✓";position:absolute;top:6px;right:8px;width:22px;height:22px;background:var(--primary-gradient);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;z-index:2}
+        .theme-card .theme-preview{height:54px;display:flex;align-items:flex-end;padding:6px}
+        .theme-card .theme-preview .swatch{flex:1;height:30px;border-radius:6px;margin-right:3px}
+        .theme-card .theme-preview .swatch:last-child{margin-right:0}
+        .theme-card .theme-name{padding:8px 10px;font-size:12px;font-weight:600;text-align:center;color:var(--text-primary);background:var(--bg-card)}
+        .theme-card .theme-desc{padding:0 10px 8px;font-size:10px;text-align:center;color:var(--text-muted)}
+        /* 深色侧边栏适配 */
+        body.theme-dark .sidebar{background:#0a0e1a}
+        body.theme-dark .nav-item.active{background:var(--primary-gradient);color:#fff}
+        body.theme-amber .sidebar{background:#2a1a08}
+        body.theme-ink .sidebar{background:#000}
+        body.theme-midnight .sidebar{background:#060a18}
+        body.theme-sakura .sidebar{background:#3a1a26}
+
+        /* ============================================================ */
+        /* 12 种风格各异的完整 UI 主题（基于真实茶文化视觉语言） */
+        /* 避开 generic-AI 陷阱：不用毛玻璃、不用霓虹深色、不用紫蓝渐变 */
+        /* ============================================================ */
+
+        /* ----- T1 翠芽初春 · 清晨现代（Inter + 晨光细线） ----- */
+        body.t1{font-family:'Inter',-apple-system,sans-serif}
+        body.t1 .sidebar{background:#1a2820}
+        body.t1 .sidebar-brand{border-bottom:1px solid rgba(91,168,122,0.15)}
+        body.t1 .nav-item{color:rgba(255,255,255,0.6);font-weight:500}
+        body.t1 .nav-item:hover{background:rgba(91,168,122,0.08);color:#fff}
+        body.t1 .nav-item.active{background:linear-gradient(135deg,#3d8b5a 0%,#5ba87a 100%);color:#fff;box-shadow:0 4px 14px rgba(61,139,90,0.3)}
+        body.t1 .logo-icon{background:linear-gradient(135deg,#3d8b5a 0%,#5ba87a 100%)}
+        body.t1 .card{border-radius:16px;border:1px solid #d8e4dc;box-shadow:0 1px 3px rgba(26,40,32,0.04),0 4px 16px rgba(26,40,32,0.06)}
+        body.t1 .card:hover{box-shadow:0 2px 6px rgba(26,40,32,0.06),0 12px 32px rgba(26,40,32,0.10)}
+        body.t1 .btn-primary{background:linear-gradient(135deg,#3d8b5a 0%,#5ba87a 100%);box-shadow:0 4px 12px rgba(61,139,90,0.2)}
+        body.t1 .page-header h1{font-weight:800;letter-spacing:-0.5px}
+        body.t1 .page-header .sub{border-left:4px solid #3d8b5a}
+        body.t1 .card-value{font-weight:700;letter-spacing:-0.5px}
+
+        /* ----- T2 白瓷雅集 · 宋瓷留白（Noto Serif + 大间距 + 细描边） ----- */
+        body.t2{font-family:'Noto Serif SC',serif;background:#faf8f3;color:#2a2e26}
+        body.t2 .sidebar{background:#fbfaf7;border-right:1px solid #e6e2da;color:#5a5e54;width:210px}
+        body.t2 .sidebar-brand{border-bottom:1px solid #e6e2da}
+        body.t2 .brand-text{color:#2a2e26;font-weight:500;letter-spacing:2px}
+        body.t2 .brand-text span{color:#6b8e7f}
+        body.t2 .nav-item{color:#7a7e74;border-radius:6px;padding:9px 14px;font-size:13px;font-weight:400}
+        body.t2 .nav-item:hover{background:#f0eeea;color:#2a2e26}
+        body.t2 .nav-item.active{background:transparent;color:#4a6b5e;box-shadow:none;font-weight:600;border-left:2px solid #6b8e7f;padding-left:12px;border-radius:0}
+        body.t2 .nav-item.active i{color:#6b8e7f}
+        body.t2 .logo-icon{background:#6b8e7f;border-radius:50%;font-family:'Noto Serif SC',serif}
+        body.t2 .card{background:#fffefb;border:1px solid #e6e2da;border-radius:2px;box-shadow:none;padding:28px 30px}
+        body.t2 .card:hover{box-shadow:0 1px 8px rgba(42,46,38,0.04)}
+        body.t2 .card-header{margin-bottom:18px}
+        body.t2 .card-header h3{font-family:'Noto Serif SC',serif;font-weight:500;letter-spacing:2px;color:#2a2e26}
+        body.t2 .card-value{font-family:'Noto Serif SC',serif;font-weight:500}
+        body.t2 .btn-primary{background:#4a6b5e;border-radius:1px;padding:10px 32px;box-shadow:none;font-family:'Noto Serif SC',serif;letter-spacing:1px}
+        body.t2 .btn-outline{border:1px solid #4a6b5e;color:#4a6b5e;border-radius:1px}
+        body.t2 .btn-secondary{background:#f0eeea;border-radius:1px}
+        body.t2 .topbar{background:#fbfaf7;border-bottom:1px solid #e6e2da;backdrop-filter:none}
+        body.t2 .page-header{margin-bottom:32px}
+        body.t2 .page-header h1{font-family:'Noto Serif SC',serif;font-weight:500;letter-spacing:4px}
+        body.t2 .page-header .sub{border-left:1px solid #6b8e7f;color:#5a5e54;padding-left:20px;font-size:13px;line-height:1.8}
+        body.t2 .content{padding:36px 48px 56px}
+        body.t2 .grid-4,body.t2 .grid-3,body.t2 .grid-2{gap:24px}
+        body.t2 .alert-bar{background:#fbfaf7;border:1px solid #e6e2da;border-left:1px solid #b8956a}
+
+        /* ----- T3 竹海深篁 · 深沉材质（Source Serif + 竹纹 + 实色边框） ----- */
+        body.t3{font-family:'Noto Serif SC',serif;background:#1a2a22;color:#e8e8d8;min-height:100vh;background-image:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(122,155,106,0.03) 3px,rgba(122,155,106,0.03) 4px)}
+        body.t3 .sidebar{background:#14201a;border-right:2px solid #3a5a4a}
+        body.t3 .sidebar-brand{border-bottom:1px solid #3a5a4a}
+        body.t3 .brand-text{color:#e8e8d8}
+        body.t3 .nav-item{color:rgba(232,232,216,0.6);font-family:'Noto Serif SC',serif}
+        body.t3 .nav-item:hover{background:rgba(122,155,106,0.08);color:#e8e8d8;border-left:2px solid #7a9b6a;padding-left:12px}
+        body.t3 .nav-item.active{background:#243a2e;color:#e8e8d8;border-left:3px solid #c4a050;padding-left:11px;border-radius:0}
+        body.t3 .logo-icon{background:#3a5a4a;border:1px solid #7a9b6a;border-radius:2px}
+        body.t3 .card{background:#243a2e;border:1px solid #3a5a4a;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.2);color:#e8e8d8}
+        body.t3 .card:hover{border-color:#7a9b6a;box-shadow:0 4px 16px rgba(0,0,0,0.3)}
+        body.t3 .card .card-label,body.t3 .card-header h3,body.t3 .text-muted{color:#a0b0a0!important}
+        body.t3 .card .card-value{color:#e8e8d8;font-family:'Noto Serif SC',serif}
+        body.t3 .card-header h3{letter-spacing:1px}
+        body.t3 .topbar{background:#14201a;border-bottom:1px solid #3a5a4a;backdrop-filter:none}
+        body.t3 .topbar-left .page-title{color:#e8e8d8}
+        body.t3 .btn-primary{background:#3a5a4a;border:1px solid #7a9b6a;box-shadow:none}
+        body.t3 .btn-outline{border:1px solid #7a9b6a;color:#7a9b6a}
+        body.t3 .badge-status{color:#c4a050;background:#2a3a2e}
+        body.t3 .page-header h1{color:#e8e8d8;font-family:'Noto Serif SC',serif;letter-spacing:2px}
+        body.t3 .page-header .sub{border-left:2px solid #c4a050;color:#a0b0a0}
+        body.t3 .upload-drop{background:#1a2a22;border-color:#3a5a4a;color:#a0b0a0}
+        body.t3 .upload-drop i{color:#7a9b6a}
+
+        /* ----- T4 溪涧清泉 · 圆润错落（Quicksand + 不对称圆角） ----- */
+        body.t4{font-family:'Quicksand',sans-serif;background:#eaf4f6}
+        body.t4 .sidebar{background:#0a2a32}
+        body.t4 .sidebar-brand{border-bottom:1px solid rgba(42,138,158,0.2)}
+        body.t4 .nav-item{color:rgba(255,255,255,0.65);border-radius:16px;font-weight:600}
+        body.t4 .nav-item:hover{background:rgba(74,170,184,0.12);color:#fff}
+        body.t4 .nav-item.active{background:linear-gradient(135deg,#2a8a9e 0%,#4aaab8 100%);color:#fff;border-radius:16px}
+        body.t4 .logo-icon{background:linear-gradient(135deg,#2a8a9e,#4aaab8);border-radius:50% 50% 40% 60%}
+        body.t4 .card{border-radius:24px 20px 24px 20px;border:1px solid #c8e0e4;box-shadow:0 6px 20px rgba(10,42,50,0.08);position:relative;overflow:hidden}
+        body.t4 .card:nth-child(even){border-radius:20px 24px 20px 24px}
+        body.t4 .card::before{content:'';position:absolute;top:0;left:0;width:6px;height:100%;background:linear-gradient(180deg,#2a8a9e,#4aaab8)}
+        body.t4 .btn-primary{background:linear-gradient(135deg,#2a8a9e 0%,#4aaab8 100%);border-radius:50px;font-weight:600}
+        body.t4 .btn-outline{border:2px solid #2a8a9e;color:#2a8a9e;border-radius:50px}
+        body.t4 .zone-card{border-radius:24px 20px 24px 20px}
+        body.t4 .page-header h1{color:#0a2a32;font-weight:700;letter-spacing:-0.5px}
+        body.t4 .card-value{font-weight:700;letter-spacing:-0.5px}
+
+        /* ----- T5 紫砂古韵 · 文人厚朴（Cormorant + 印章红 + 泥料边框） ----- */
+        body.t5{font-family:'Cormorant Garamond',serif;background:#f5f0e8;color:#3a2418}
+        body.t5 .sidebar{background:#3a2418;border-right:2px solid #8a5a3a}
+        body.t5 .sidebar-brand{border-bottom:1px solid #5a3a24;position:relative}
+        body.t5 .sidebar-brand::after{content:'茶';position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-3deg);width:30px;height:30px;background:#a02020;color:#fff;font-family:'ZCOOL XiaoWei',serif;font-size:18px;display:flex;align-items:center;justify-content:center;border-radius:2px;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+        body.t5 .nav-item{color:rgba(245,240,232,0.65);font-family:'Cormorant Garamond',serif;font-size:16px;border-radius:2px;padding:9px 14px}
+        body.t5 .nav-item:hover{background:rgba(138,90,58,0.15);color:#f5f0e8}
+        body.t5 .nav-item.active{background:#5a3a24;color:#f5f0e8;border-left:3px solid #a02020;padding-left:11px;border-radius:0}
+        body.t5 .logo-icon{background:#8a5a3a;border-radius:2px;border:1px solid #a8784a}
+        body.t5 .card{background:#fbf7f0;border:1px solid #d4c4a8;border-radius:4px;box-shadow:0 1px 4px rgba(58,36,24,0.06);position:relative;padding:22px 24px}
+        body.t5 .card::before{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border:1px solid rgba(138,90,58,0.15);border-radius:3px;pointer-events:none}
+        body.t5 .card-header h3{font-family:'Cormorant Garamond',serif;color:#5a3a24;font-weight:600;letter-spacing:0.5px;font-size:17px}
+        body.t5 .card-value{font-family:'Cormorant Garamond',serif;font-weight:600}
+        body.t5 .btn-primary{background:#5a3a24;border-radius:2px;font-family:'Cormorant Garamond',serif;letter-spacing:1px;box-shadow:1px 2px 3px rgba(58,36,24,0.15)}
+        body.t5 .btn-outline{border:1px solid #5a3a24;color:#5a3a24;border-radius:2px;font-family:'Cormorant Garamond',serif}
+        body.t5 .topbar{background:rgba(245,240,232,0.95);border-bottom:1px solid #d4c4a8;backdrop-filter:none}
+        body.t5 .page-header h1{font-family:'Cormorant Garamond',serif;color:#3a2418;letter-spacing:1px;font-weight:600}
+        body.t5 .page-header .sub{border-left:3px solid #a02020;color:#5a3a24;font-family:'Cormorant Garamond',serif;font-size:15px;font-style:italic}
+
+        /* ----- T6 秋茶金毫 · 报纸分栏（Bodoni + 双线 + 报纸纹） ----- */
+        body.t6{font-family:'Bodoni Moda',serif;background:#faf3e0;color:#2a1e08;background-image:repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(168,120,46,0.05) 31px,rgba(168,120,46,0.05) 32px)}
+        body.t6 .sidebar{background:#2a1e08;border-right:3px double #a8782e}
+        body.t6 .sidebar-brand{border-bottom:3px double #a8782e}
+        body.t6 .brand-text{font-family:'Bodoni Moda',serif;font-weight:700;letter-spacing:1px}
+        body.t6 .nav-item{color:rgba(245,234,208,0.65);font-family:'Bodoni Moda',serif;font-style:italic;border-radius:0;padding:10px 14px}
+        body.t6 .nav-item:hover{background:rgba(168,120,46,0.15);color:#f5ead0}
+        body.t6 .nav-item.active{background:#a8782e;color:#fff;font-style:normal;font-weight:700;letter-spacing:1px;border-radius:0}
+        body.t6 .logo-icon{background:#a8782e;border-radius:0;border:2px solid #c49a3e}
+        body.t6 .card{background:#fffdf5;border:1px solid #a8782e;border-radius:0;padding:24px;box-shadow:3px 3px 0 #e8d8b8;position:relative}
+        body.t6 .card::before{content:'';position:absolute;top:5px;left:5px;right:5px;bottom:5px;border:1px solid #e8d8b8;pointer-events:none}
+        body.t6 .card-header h3{font-family:'Bodoni Moda',serif;font-style:italic;color:#7a5a1e;letter-spacing:1px;font-weight:600}
+        body.t6 .card-value{font-family:'Bodoni Moda',serif;font-weight:700}
+        body.t6 .btn-primary{background:#a8782e;border-radius:0;box-shadow:2px 2px 0 #7a5a1e;font-family:'Bodoni Moda',serif;letter-spacing:1px}
+        body.t6 .btn-outline{border:2px solid #a8782e;color:#a8782e;border-radius:0;font-family:'Bodoni Moda',serif}
+        body.t6 .topbar{background:#faf3e0;border-bottom:3px double #a8782e;backdrop-filter:none}
+        body.t6 .page-header h1{font-family:'Bodoni Moda',serif;letter-spacing:1px;font-weight:700}
+        body.t6 .page-header .sub{border-left:3px double #a8782e;color:#5a4a2e;font-family:'Bodoni Moda',serif;font-style:italic}
+
+        /* ----- T7 墨竹写意 · 文人水墨（Ma Shan Zheng + 宣纸 + 红印章） ----- */
+        body.t7{font-family:'ZCOOL XiaoWei',serif;background:#f0e8d0;color:#1a1a1a;background-image:radial-gradient(circle at 15% 15%,rgba(160,32,32,0.04) 0%,transparent 25%),radial-gradient(circle at 85% 85%,rgba(160,112,80,0.05) 0%,transparent 30%)}
+        body.t7 .sidebar{background:#1a1a1a;border-right:1px solid #5a5a5a}
+        body.t7 .sidebar-brand{border-bottom:1px solid #4a4a4a;position:relative}
+        body.t7 .sidebar-brand::after{content:'墨';position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-4deg);width:32px;height:32px;background:#a02020;color:#fff;font-family:'Ma Shan Zheng',serif;font-size:22px;display:flex;align-items:center;justify-content:center;border-radius:2px;box-shadow:0 2px 4px rgba(0,0,0,0.3)}
+        body.t7 .brand-text{font-family:'Ma Shan Zheng',serif;font-weight:400;letter-spacing:2px}
+        body.t7 .nav-item{color:rgba(255,255,255,0.65);font-family:'ZCOOL XiaoWei',serif;font-size:16px;border-radius:0;padding:11px 14px;letter-spacing:2px}
+        body.t7 .nav-item:hover{background:rgba(160,112,80,0.15);color:#fff;border-left:3px solid #a07050;padding-left:11px}
+        body.t7 .nav-item.active{background:linear-gradient(90deg,#2a2a2a 0%,#4a4a4a 100%);color:#fff;border-left:4px solid #a02020;padding-left:10px}
+        body.t7 .logo-icon{background:#a02020;border-radius:2px;font-family:'Ma Shan Zheng',serif}
+        body.t7 .card{background:#f8f3e4;border:1px solid #a07050;border-radius:2px;padding:24px 26px;box-shadow:2px 2px 8px rgba(0,0,0,0.08);position:relative}
+        body.t7 .card::before{content:'';position:absolute;top:5px;left:5px;right:5px;bottom:5px;border:1px solid rgba(160,112,80,0.25);pointer-events:none}
+        body.t7 .card-header h3{font-family:'Ma Shan Zheng',serif;color:#1a1a1a;letter-spacing:4px;font-weight:400;font-size:18px}
+        body.t7 .card-value{font-family:'ZCOOL XiaoWei',serif;font-weight:400}
+        body.t7 .btn-primary{background:#a02020;border-radius:2px;font-family:'ZCOOL XiaoWei',serif;letter-spacing:3px;box-shadow:1px 2px 4px rgba(0,0,0,0.15)}
+        body.t7 .btn-outline{border:1px solid #1a1a1a;color:#1a1a1a;border-radius:2px;font-family:'ZCOOL XiaoWei',serif;letter-spacing:2px}
+        body.t7 .topbar{background:rgba(240,232,208,0.96);border-bottom:1px solid #a07050;backdrop-filter:none}
+        body.t7 .page-header h1{font-family:'Ma Shan Zheng',serif;letter-spacing:6px;font-weight:400}
+        body.t7 .page-header .sub{border-left:3px solid #a02020;color:#3a3a3a;font-family:'ZCOOL XiaoWei',serif;letter-spacing:1px}
+
+        /* ----- T8 晚霞红茶 · 温润包裹（Lora + 暖色微光 + 实色） ----- */
+        body.t8{font-family:'Lora',serif;background:#fdf0ec;color:#2a1414}
+        body.t8 .sidebar{background:#2a1414;border-right:1px solid #5a2424}
+        body.t8 .sidebar-brand{border-bottom:1px solid #5a2424}
+        body.t8 .brand-text{font-family:'Lora',serif;font-weight:600;letter-spacing:0.5px}
+        body.t8 .nav-item{color:rgba(245,224,220,0.65);font-family:'Lora',serif;font-size:15px;border-radius:8px;padding:9px 14px}
+        body.t8 .nav-item:hover{background:rgba(139,58,58,0.2);color:#f5e0dc}
+        body.t8 .nav-item.active{background:#5a2424;color:#fffaf8;border-radius:8px;border-left:3px solid #c4882e;padding-left:11px}
+        body.t8 .logo-icon{background:#8b3a3a;border-radius:8px;border:1px solid #a85656}
+        body.t8 .card{background:#fffaf8;border:1px solid #ecd4cc;border-radius:14px;padding:22px 24px;box-shadow:0 2px 8px rgba(42,20,20,0.05);position:relative;overflow:hidden}
+        body.t8 .card::before{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#8b3a3a,#c4882e,#8b3a3a);opacity:0.4}
+        body.t8 .card:hover{box-shadow:0 6px 20px rgba(42,20,20,0.10)}
+        body.t8 .card-header h3{font-family:'Lora',serif;color:#5a2424;font-weight:600;font-style:italic}
+        body.t8 .card-value{font-family:'Lora',serif;font-weight:700;color:#8b3a3a}
+        body.t8 .btn-primary{background:#8b3a3a;border-radius:8px;font-family:'Lora',serif;font-style:italic;box-shadow:0 3px 10px rgba(139,58,58,0.2)}
+        body.t8 .btn-outline{border:1px solid #8b3a3a;color:#8b3a3a;border-radius:8px;font-family:'Lora',serif}
+        body.t8 .topbar{background:rgba(253,240,236,0.95);border-bottom:1px solid #ecd4cc;backdrop-filter:none}
+        body.t8 .page-header h1{font-family:'Lora',serif;color:#8b3a3a;font-weight:700;font-style:italic}
+        body.t8 .page-header .sub{border-left:3px solid #c4882e;color:#5a3434;font-family:'Lora',serif;font-style:italic}
+
+        /* ----- T9 夜露凝香 · 静谧深色（Inter + 银边 + 实色无玻璃） ----- */
+        body.t9{font-family:'Inter',sans-serif;background:#141c24;color:#e8eef0;min-height:100vh}
+        body.t9 .sidebar{background:#0a141c;border-right:1px solid #2a3a44}
+        body.t9 .sidebar-brand{border-bottom:1px solid #2a3a44}
+        body.t9 .brand-text{color:#e8eef0;font-weight:600;letter-spacing:-0.3px}
+        body.t9 .nav-item{color:rgba(232,238,240,0.55);font-weight:500;border-radius:10px;padding:10px 14px}
+        body.t9 .nav-item:hover{background:rgba(90,138,126,0.1);color:#e8eef0}
+        body.t9 .nav-item.active{background:#2a3a44;color:#e8eef0;border-left:2px solid #5a8a7e;padding-left:12px;border-radius:0}
+        body.t9 .logo-icon{background:#3a4a54;border:1px solid #5a8a7e;border-radius:8px}
+        body.t9 .card{background:#1e2a34;border:1px solid #2a3a44;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.15);color:#e8eef0;position:relative}
+        body.t9 .card::after{content:'';position:absolute;top:0;left:12px;right:12px;height:1px;background:linear-gradient(90deg,transparent,#5a8a7e,transparent);opacity:0.5}
+        body.t9 .card:hover{border-color:#5a8a7e;box-shadow:0 4px 16px rgba(0,0,0,0.25)}
+        body.t9 .card .card-label,body.t9 .card-header h3,body.t9 .text-muted{color:#a0b0b4!important}
+        body.t9 .card .card-value{color:#e8eef0;font-weight:700}
+        body.t9 .card-header h3{letter-spacing:0.3px}
+        body.t9 .btn-primary{background:#3a4a54;border:1px solid #5a8a7e;border-radius:8px;color:#e8eef0;box-shadow:none}
+        body.t9 .btn-outline{border:1px solid #5a8a7e;color:#5a8a7e;border-radius:8px;background:transparent}
+        body.t9 .badge-status{color:#c4a850;background:#1e2a34}
+        body.t9 .topbar{background:#0a141c;border-bottom:1px solid #2a3a44;backdrop-filter:none}
+        body.t9 .topbar-left .page-title{color:#e8eef0}
+        body.t9 .page-header h1{color:#e8eef0;font-weight:700;letter-spacing:-0.3px}
+        body.t9 .page-header .sub{border-left:2px solid #5a8a7e;color:#a0b0b4}
+        body.t9 .upload-drop{background:#1a2a34;border-color:#2a3a44;color:#a0b0b4}
+        body.t9 .upload-drop i{color:#5a8a7e}
+
+        /* ----- T10 春樱茶会 · 日式柔美（Noto Sans JP + 不对称 + 抹茶绿点缀） ----- */
+        body.t10{font-family:'Noto Sans JP',sans-serif;background:#fdf0f2;color:#2a1a1e}
+        body.t10 .sidebar{background:#3a2428;border-right:1px solid #9a5a6e}
+        body.t10 .sidebar-brand{border-bottom:1px solid #5a3a44}
+        body.t10 .brand-text{font-family:'Noto Sans JP',sans-serif;font-weight:500;letter-spacing:1px}
+        body.t10 .nav-item{color:rgba(245,224,228,0.65);font-family:'Noto Sans JP',sans-serif;font-size:14px;border-radius:4px;padding:10px 14px}
+        body.t10 .nav-item:hover{background:rgba(196,122,142,0.12);color:#f5e0e4}
+        body.t10 .nav-item.active{background:transparent;color:#f5e0e4;border-left:2px solid #c47a8e;padding-left:12px;border-radius:0;font-weight:500}
+        body.t10 .logo-icon{background:#c47a8e;border-radius:50%}
+        body.t10 .card{background:#fffafc;border:1px solid #e8d0d4;border-radius:4px;padding:24px 26px;box-shadow:0 1px 4px rgba(42,26,30,0.04);position:relative}
+        body.t10 .card::after{content:'';position:absolute;top:0;left:0;width:100%;height:1px;background:#c47a8e;opacity:0.3}
+        body.t10 .card:hover{box-shadow:0 4px 16px rgba(196,122,142,0.12);transform:translateY(-1px)}
+        body.t10 .card-header h3{font-family:'Noto Sans JP',sans-serif;color:#9a5a6e;font-weight:500;letter-spacing:1px}
+        body.t10 .card-value{font-family:'Noto Sans JP',sans-serif;font-weight:500;color:#c47a8e}
+        body.t10 .btn-primary{background:#c47a8e;border-radius:2px;font-family:'Noto Sans JP',sans-serif;letter-spacing:1px;box-shadow:0 2px 6px rgba(196,122,142,0.15)}
+        body.t10 .btn-outline{border:1px solid #9a5a6e;color:#9a5a6e;border-radius:2px;font-family:'Noto Sans JP',sans-serif}
+        body.t10 .btn-secondary{background:#f5e0e4;color:#5a3a44;border-radius:2px}
+        body.t10 .topbar{background:rgba(253,240,242,0.96);border-bottom:1px solid #e8d0d4;backdrop-filter:none}
+        body.t10 .page-header h1{font-family:'Noto Sans JP',sans-serif;color:#9a5a6e;font-weight:500;letter-spacing:2px}
+        body.t10 .page-header .sub{border-left:1px solid #c47a8e;color:#5a3a44;font-family:'Noto Sans JP',sans-serif}
+        body.t10 .badge-status{color:#7a9b6a;background:#eef2ec}
+        body.t10 .page-header .sub .highlight{background:#f5e0e4;color:#9a5a6e}
+
+        /* ----- T11 老茶陈韵 · 岁月做旧（EB Garamond + 包浆铜 + 双线框） ----- */
+        body.t11{font-family:'EB Garamond',serif;background:#f0e8d8;color:#2a1e0a;background-image:radial-gradient(circle at 30% 30%,rgba(139,106,62,0.04) 0%,transparent 40%),radial-gradient(circle at 70% 70%,rgba(139,106,62,0.03) 0%,transparent 40%)}
+        body.t11 .sidebar{background:#2a1e0a;border-right:2px solid #8b6a3e}
+        body.t11 .sidebar-brand{border-bottom:1px solid #5a4424;position:relative}
+        body.t11 .sidebar-brand::after{content:'陳';position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(-2deg);width:28px;height:28px;background:#4a6b5e;color:#f0e8d8;font-family:'EB Garamond',serif;font-size:16px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid #6b8e7f;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
+        body.t11 .brand-text{font-family:'EB Garamond',serif;font-weight:600;letter-spacing:1px}
+        body.t11 .nav-item{color:rgba(240,232,216,0.65);font-family:'EB Garamond',serif;font-size:16px;border-radius:2px;padding:10px 14px;font-style:italic}
+        body.t11 .nav-item:hover{background:rgba(139,106,62,0.2);color:#f0e8d8}
+        body.t11 .nav-item.active{background:#5a4424;color:#f0e8d8;font-style:normal;border-left:3px solid #8b6a3e;padding-left:11px;border-radius:0}
+        body.t11 .logo-icon{background:#8b6a3e;border-radius:50%;border:1px solid #a8845a;box-shadow:inset 0 1px 0 rgba(240,232,216,0.2)}
+        body.t11 .card{background:#f8f2e4;border:1px solid #8b6a3e;border-radius:6px;padding:22px 24px;box-shadow:0 2px 6px rgba(42,30,10,0.08);position:relative}
+        body.t11 .card::before{content:'';position:absolute;top:3px;left:3px;right:3px;bottom:3px;border:1px solid rgba(139,106,62,0.2);border-radius:4px;pointer-events:none}
+        body.t11 .card-header h3{font-family:'EB Garamond',serif;color:#5a4424;font-weight:600;letter-spacing:1px;font-style:italic;font-size:17px}
+        body.t11 .card-value{font-family:'EB Garamond',serif;font-weight:600;color:#8b6a3e}
+        body.t11 .btn-primary{background:#5a4424;border-radius:4px;font-family:'EB Garamond',serif;letter-spacing:1px;box-shadow:0 2px 4px rgba(42,30,10,0.15)}
+        body.t11 .btn-outline{border:1px solid #5a4424;color:#5a4424;border-radius:4px;font-family:'EB Garamond',serif;font-style:italic}
+        body.t11 .topbar{background:rgba(240,232,216,0.96);border-bottom:1px solid #8b6a3e;backdrop-filter:none}
+        body.t11 .page-header h1{font-family:'EB Garamond',serif;color:#2a1e0a;font-weight:600;letter-spacing:1px;font-style:italic}
+        body.t11 .page-header .sub{border-left:3px solid #8b6a3e;color:#5a4424;font-family:'EB Garamond',serif;font-style:italic}
+
+        /* ----- T12 素简当代 · 瑞士网格（Space Mono + 黑线 + 偏移阴影） ----- */
+        body.t12{font-family:'Space Mono',monospace;background:#fafafa;color:#0a0a0a}
+        body.t12 .sidebar{background:#0a0a0a;border-right:2px solid #000;width:210px}
+        body.t12 .sidebar-brand{border-bottom:2px solid #000;padding:0 20px 20px 20px}
+        body.t12 .brand-text{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-1px;color:#fff;text-transform:uppercase}
+        body.t12 .brand-text span{color:#cc2847}
+        body.t12 .brand-sub{font-family:'Space Mono',monospace;letter-spacing:3px;text-transform:uppercase;font-size:9px}
+        body.t12 .nav-item{color:rgba(255,255,255,0.55);border-radius:0;padding:12px 16px;font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:11px;border-left:3px solid transparent}
+        body.t12 .nav-item:hover{background:#000;color:#fff;border-left:3px solid #cc2847}
+        body.t12 .nav-item.active{background:#cc2847;color:#fff;border-left:3px solid #fff;font-weight:700}
+        body.t12 .nav-item i{font-family:'FontAwesome';text-transform:none}
+        body.t12 .logo-icon{background:#cc2847;border-radius:0;font-family:'Space Mono',monospace}
+        body.t12 .card{background:#fff;border:1px solid #000;border-radius:0;padding:20px;box-shadow:4px 4px 0 #000;transition:all .15s ease;font-family:'Space Mono',monospace}
+        body.t12 .card:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 #000}
+        body.t12 .card-header h3{font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:12px}
+        body.t12 .card-value{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-1px}
+        body.t12 .card .card-label{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;font-size:11px}
+        body.t12 .btn-primary{background:#000;color:#fff;border-radius:0;padding:12px 28px;font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:11px;box-shadow:3px 3px 0 #cc2847}
+        body.t12 .btn-primary:hover{transform:translate(1px,1px);box-shadow:2px 2px 0 #cc2847}
+        body.t12 .btn-outline{border:2px solid #000;color:#000;border-radius:0;font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:1px;font-size:11px}
+        body.t12 .btn-secondary{background:#f0f0f0;border:1px solid #000;border-radius:0;font-family:'Space Mono',monospace;text-transform:uppercase;font-size:11px}
+        body.t12 .topbar{background:#fafafa;border-bottom:2px solid #000;backdrop-filter:none}
+        body.t12 .topbar-left .page-title{font-family:'Space Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:-0.5px}
+        body.t12 .page-header h1{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-1px;text-transform:uppercase}
+        body.t12 .page-header .sub{border-left:4px solid #cc2847;font-family:'Space Mono',monospace;font-size:13px}
+        body.t12 .page-header .sub .highlight{background:#cc2847;color:#fff;font-family:'Space Mono',monospace}
+        body.t12 .zone-card{border-radius:0;border:1px solid #000;box-shadow:4px 4px 0 #000;font-family:'Space Mono',monospace}
+        body.t12 .grid-4,body.t12 .grid-3,body.t12 .grid-2{gap:16px}
+        body.t12 .alert-bar{border:1px solid #000;border-left:4px solid #cc2847;box-shadow:3px 3px 0 #cc2847;border-radius:0;font-family:'Space Mono',monospace}
+        body.t12 .badge{font-family:'Space Mono',monospace;text-transform:uppercase;letter-spacing:0.5px}
+        body.t12 .badge-status{color:#cc2847;background:#fff;border:1px solid #000;font-family:'Space Mono',monospace}
+        body.t12 .location-bar{font-family:'Space Mono',monospace;border:1px solid #000;border-radius:0;background:#fff}
+    </style>
+</head>
+<body>
+
+    <!-- ====== 顶部导航（官网风格） ====== -->
+    <div class="main">
+        <header class="topbar nav-bar">
+            <div class="nav-logo" data-page="dashboard" title="返回首页">
+                <div class="logo-icon"><i class="fas fa-leaf"></i></div>
+                <div class="nav-logo-text">茶<span>智管</span></div>
+            </div>
+            <nav class="top-nav" id="topNav">
+                <div class="nav-link active" data-page="dashboard"><i class="fas fa-chart-pie"></i><span>首页</span></div>
+                <div class="nav-group" id="grpProd">
+                    <span class="nav-group-title" data-group="grpProd"><i class="fas fa-leaf"></i><span>生产智管</span> <i class="fas fa-chevron-down caret"></i></span>
+                    <div class="nav-dropdown">
+                        <div class="nav-link" data-page="map"><i class="fas fa-map-marked-alt"></i><span>数字地图</span></div>
+                        <div class="nav-link" data-page="ai"><i class="fas fa-brain"></i><span>AI 识别</span></div>
+                        <div class="nav-link" data-page="decision"><i class="fas fa-robot"></i><span>智能决策</span></div>
+                        <div class="nav-link" data-page="devices"><i class="fas fa-microchip"></i><span>设备管理</span><span class="badge-count">6</span></div>
+                        <div class="nav-link" data-page="trends"><i class="fas fa-chart-line"></i><span>历史趋势</span></div>
+                        <div class="nav-link" data-page="calendar"><i class="fas fa-calendar-alt"></i><span>农事日历</span></div>
+                    </div>
+                </div>
+                <div class="nav-group" id="grpBiz">
+                    <span class="nav-group-title" data-group="grpBiz"><i class="fas fa-store"></i><span>经营服务</span> <i class="fas fa-chevron-down caret"></i></span>
+                    <div class="nav-dropdown">
+                        <div class="nav-link" data-page="report"><i class="fas fa-file-alt"></i><span>管理报告</span></div>
+                        <div class="nav-link" data-page="tourism"><i class="fas fa-umbrella-beach"></i><span>文旅服务</span></div>
+                        <div class="nav-link" data-page="industry"><i class="fas fa-building-columns"></i><span>产业数据</span></div>
+                    </div>
+                </div>
+                <div class="nav-link" data-page="settings"><i class="fas fa-cog"></i><span>设置</span></div>
+            </nav>
+            <div class="topbar-right">
+                <span class="badge-status"><i class="fas fa-circle" style="font-size:8px;"></i> 系统在线</span>
+                <span class="time" id="clockDisplay"><i class="far fa-clock"></i> 加载中…</span>
+                <button class="nav-hamburger" id="navHamburger" aria-label="菜单"><i class="fas fa-bars"></i></button>
+            </div>
+        </header>
+
+        <div class="content">
+
+            <!-- ====== PAGE 1: Dashboard ====== -->
+            <section class="page active" id="page-dashboard">
+                <!-- ====== 官网风格 Hero ====== -->
+                <div class="hero">
+                    <div class="hero-vert">安吉白茶</div>
+                    <div>
+                        <div class="hero-badge"><i class="fas fa-leaf"></i> 安吉 · 中国美丽乡村发源地</div>
+                        <div class="hero-title">让每一片茶叶<br><em>都被智慧守护</em></div>
+                        <div class="hero-sub">茶智管 · 安吉智慧茶园精准管理与产业服务系统，融合物联网感知、AI 视觉识别与智能决策，覆盖种植、加工、溯源、文旅全产业链。</div>
+                        <div class="hero-cta">
+                            <button class="btn-white" onclick="goToPage('map')"><i class="fas fa-map-marked-alt"></i> 进入数字地图</button>
+                            <button class="btn-ghost" onclick="goToPage('ai')"><i class="fas fa-brain"></i> AI 病虫害识别</button>
+                        </div>
+                        <div style="margin-top:18px;font-size:12px;color:rgba(255,255,255,0.75);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                            <i class="fas fa-map-pin"></i><span id="locationText"><span class="loc-spinner"></span> 正在定位...</span>
+                            <span style="opacity:0.6;margin:0 4px;">|</span>
+                            <span><i class="fas fa-clock"></i> <span id="liveTime">加载中...</span></span>
+                        </div>
+                    </div>
+                    <div class="hero-metrics">
+                        <div class="hero-metric">
+                            <div class="hm-label"><i class="fas fa-thermometer-half"></i> 实时温度 <span class="data-tag sim" id="tempTag">模拟</span></div>
+                            <div class="hm-value" id="dTemp">-- °C</div>
+                            <span class="hm-change" id="dTempChange">--</span>
+                        </div>
+                        <div class="hero-metric">
+                            <div class="hm-label"><i class="fas fa-tint"></i> 空气湿度 <span class="data-tag sim" id="humiTag">模拟</span></div>
+                            <div class="hm-value" id="dHumi">-- %</div>
+                            <span class="hm-change" id="dHumiChange">--</span>
+                        </div>
+                        <div class="hero-metric">
+                            <div class="hm-label"><i class="fas fa-water"></i> 土壤水分 <span class="data-tag sim" id="soilTag">模拟</span></div>
+                            <div class="hm-value" id="dSoil">-- %</div>
+                            <span class="hm-change" id="dSoilChange">--</span>
+                        </div>
+                        <div class="hero-metric">
+                            <div class="hm-label"><i class="fas fa-sun"></i> 光照强度 <span class="data-tag sim" id="lightTag">模拟</span></div>
+                            <div class="hm-value" id="dLight">-- Lux</div>
+                            <span class="hm-change" id="dLightChange">--</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ====== 数据统计条 ====== -->
+                <div class="stats-strip">
+                    <div class="stat-item"><div class="si-icon"><i class="fas fa-building-columns"></i></div><div><div class="si-num">47</div><div class="si-label">接入茶园</div></div></div>
+                    <div class="stat-item"><div class="si-icon"><i class="fas fa-users"></i></div><div><div class="si-num">128</div><div class="si-label">服务茶农</div></div></div>
+                    <div class="stat-item"><div class="si-icon"><i class="fas fa-vector-square"></i></div><div><div class="si-num">3,260</div><div class="si-label">覆盖面积（亩）</div></div></div>
+                    <div class="stat-item"><div class="si-icon"><i class="fas fa-seedling"></i></div><div><div class="si-num">1,240</div><div class="si-label">今日产量（kg）</div></div></div>
+                </div>
+
+                <!-- ====== 特色板块 ====== -->
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="fc-icon"><i class="fas fa-satellite-dish"></i></div>
+                        <div class="fc-title">物联网感知</div>
+                        <div class="fc-desc">温湿度、土壤水分、光照等传感器实时回传，茶园状态尽在掌握</div>
+                        <div class="fc-line"></div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="fc-icon"><i class="fas fa-brain"></i></div>
+                        <div class="fc-title">AI 视觉识别</div>
+                        <div class="fc-desc">基于 YOLOv8n 边缘端部署模型，精准识别病虫害并给出防治方案</div>
+                        <div class="fc-line"></div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="fc-icon"><i class="fas fa-robot"></i></div>
+                        <div class="fc-title">智能决策</div>
+                        <div class="fc-desc">基于环境参数与天气数据，推荐施药、灌溉、采摘最优方案</div>
+                        <div class="fc-line"></div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="fc-icon"><i class="fas fa-store"></i></div>
+                        <div class="fc-title">产业服务</div>
+                        <div class="fc-desc">溯源查询、文旅导览、产业数据，一平台打通茶产业链上下游</div>
+                        <div class="fc-line"></div>
+                    </div>
+                </div>
+
+                <div class="alert-bar">
+                    <div class="alert-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="alert-content" id="alertContent"><strong>AI 风险提示：</strong> 加载中...</div>
+                    <span class="alert-tag" id="alertTag">实时</span>
+                </div>
+                <div class="card" style="padding:14px 22px;">
+                    <div class="flex-between" style="flex-wrap:wrap;gap:10px;">
+                        <div style="display:flex; gap:22px; flex-wrap:wrap; font-size:13px; color:var(--text-secondary);">
+                            <span><i class="fas fa-microchip" style="color:var(--primary);"></i> 传感器在线: <strong id="sensorCount">6</strong>/6</span>
+                            <span><i class="fas fa-cloud-upload-alt" style="color:var(--primary);"></i> 数据来源: <span id="dataSource">--</span></span>
+                            <span><i class="fas fa-clock" style="color:var(--primary);"></i> 更新于: <span id="updateTime">--</span></span>
+                        </div>
+                        <button class="btn-secondary btn-sm" id="refreshBtn"><i class="fas fa-sync-alt"></i> 刷新</button>
+                    </div>
+                </div>
+                <!-- ====== 工作台：功能导航 ====== -->
+                <div class="workbench">
+                    <div class="section-title"><i class="fas fa-th-large"></i> 工作台 · 功能导航 <span class="group-tag">点击卡片进入对应板块</span><span class="sub-line"></span></div>
+                    <div class="func-group">
+                        <div class="section-title" style="font-size:13px;margin-bottom:10px;"><i class="fas fa-leaf"></i> 生产智管 <span class="sub-line"></span></div>
+                        <div class="func-grid">
+                            <div class="func-card" data-goto="map">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-map-marked-alt"></i></div><span class="func-stat" id="wbZoneCount">6 个区域</span></div>
+                                <div class="func-title">茶园数字地图</div>
+                                <div class="func-desc">可视化查看各区块状态、温湿度与处理建议</div>
+                                <div class="func-foot"><span class="func-go">进入地图 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="ai">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-brain"></i></div><span class="func-stat">YOLOv8n 边缘部署</span></div>
+                                <div class="func-title">AI 病虫害识别</div>
+                                <div class="func-desc">YOLOv8n 模型部署于硬件端，自动识别病虫害并给出防治建议</div>
+                                <div class="func-foot"><span class="func-go">开始识别 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="decision">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-robot"></i></div><span class="func-stat">智能模型</span></div>
+                                <div class="func-title">智能决策</div>
+                                <div class="func-desc">基于多维参数的施药、采摘、灌溉决策推荐</div>
+                                <div class="func-foot"><span class="func-go">生成决策 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="devices">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-microchip"></i></div><span class="func-stat" id="wbDeviceCount">6 台设备</span></div>
+                                <div class="func-title">设备管理</div>
+                                <div class="func-desc">实时监控传感器状态、电量与在线情况</div>
+                                <div class="func-foot"><span class="func-go">查看设备 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="trends">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-chart-line"></i></div><span class="func-stat">7天趋势</span></div>
+                                <div class="func-title">历史趋势</div>
+                                <div class="func-desc">温度、湿度、土壤、光照变化趋势图表</div>
+                                <div class="func-foot"><span class="func-go">查看趋势 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="calendar">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-calendar-alt"></i></div><span class="func-stat">全年计划</span></div>
+                                <div class="func-title">农事日历</div>
+                                <div class="func-desc">灌溉、施肥、打药、采摘任务日历管理</div>
+                                <div class="func-foot"><span class="func-go">打开日历 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="func-group">
+                        <div class="section-title" style="font-size:13px;margin-bottom:10px;"><i class="fas fa-store"></i> 经营服务 <span class="sub-line"></span></div>
+                        <div class="func-grid">
+                            <div class="func-card" data-goto="report">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-file-alt"></i></div><span class="func-stat">周报 · 月报</span></div>
+                                <div class="func-title">管理报告</div>
+                                <div class="func-desc">自动汇总生产、巡检、病害数据生成报告</div>
+                                <div class="func-foot"><span class="func-go">查看报告 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="industry">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-building-columns"></i></div><span class="func-stat">产值 · 行情</span></div>
+                                <div class="func-title">产业数据</div>
+                                <div class="func-desc">茶叶产量、市场行情、产业链上下游数据</div>
+                                <div class="func-foot"><span class="func-go">浏览数据 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                            <div class="func-card" data-goto="tourism">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-umbrella-beach"></i></div><span class="func-stat">茶旅融合</span></div>
+                                <div class="func-title">文旅服务</div>
+                                <div class="func-desc">茶园观光、采茶体验、茶文化推广一站式服务</div>
+                                <div class="func-foot"><span class="func-go">探索文旅 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="func-group">
+                        <div class="section-title" style="font-size:13px;margin-bottom:10px;"><i class="fas fa-sliders-h"></i> 系统 <span class="sub-line"></span></div>
+                        <div class="func-grid">
+                            <div class="func-card" data-goto="settings">
+                                <div class="func-top"><div class="func-icon"><i class="fas fa-cog"></i></div><span class="func-stat" id="wbThemeCount">12 套主题</span></div>
+                                <div class="func-title">设置 · API</div>
+                                <div class="func-desc">API Key、模型、代理、地图密钥与主题切换</div>
+                                <div class="func-foot"><span class="func-go">进入设置 <i class="fas fa-arrow-right"></i></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-tree"></i> 茶园状态速览</h3><span class="badge">实时</span></div>
+                        <div id="zoneQuickView" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-clock"></i> 今日待办</h3><span class="badge" id="todoCount">2项</span></div>
+                        <ul id="todoList" style="list-style:none;padding:0;font-size:13px;line-height:2;"></ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 2: Map ====== -->
+            <section class="page" id="page-map">
+                <div class="page-header">
+                    <h1><i class="fas fa-map-marked-alt"></i> 茶园数字地图</h1>
+                    <div class="sub">点击区域查看详细数据与处理建议</div>
+                    <div class="location-bar"><i class="fas fa-map-pin"></i><span id="mapLocationText"><span class="loc-spinner"></span> 定位中...</span></div>
+                </div>
+                <div class="grid-4">
+                    <div class="card"><div class="card-label"><i class="fas fa-vector-square" style="color:var(--primary)"></i> 覆盖面积</div><div class="card-value" id="mapTotalArea">-- 亩</div><span class="card-change neutral">3 个生产区</span></div>
+                    <div class="card"><div class="card-label"><i class="fas fa-microchip" style="color:#2c7fb8"></i> 在线传感器</div><div class="card-value" id="mapSensorOnline">--/--</div><span class="card-change neutral" id="mapSensorRate">在线率 --</span></div>
+                    <div class="card"><div class="card-label"><i class="fas fa-exclamation-triangle" style="color:#e67e22"></i> 活跃告警</div><div class="card-value" id="mapAlertCount">--</div><span class="card-change down">待处理</span></div>
+                    <div class="card"><div class="card-label"><i class="fas fa-leaf" style="color:var(--primary)"></i> 健康区块</div><div class="card-value" id="mapHealthyZones">--</div><span class="card-change up">运行良好</span></div>
+                </div>
+                <div class="grid-3" id="zoneContainer"></div>
+                <div class="card" style="margin-top:8px;padding:12px 20px;font-size:13px;color:var(--text-muted);">
+                    <i class="fas fa-info-circle"></i> 状态标识：<span class="tag green">正常</span> <span class="tag orange">缺水</span> <span class="tag red">病虫风险</span>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-satellite-dish"></i> 传感器分布</h3><span class="badge" id="sensorTotalBadge">6 台</span></div>
+                        <div class="report-table-wrap">
+                            <table class="sensor-table">
+                                <thead><tr><th>编号</th><th>区域</th><th>类型</th><th>读数</th><th>电量</th><th>状态</th></tr></thead>
+                                <tbody id="sensorTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-bell"></i> 近期告警</h3><span class="badge">时间线</span></div>
+                        <div class="timeline" id="alertTimeline"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 3: AI Recognize ====== -->
+            <section class="page" id="page-ai">
+                <div class="page-header">
+                    <h1><i class="fas fa-brain"></i> AI病虫害识别</h1>
+                    <div class="sub">上传叶片照片，通过 DeepSeek Vision API 自动识别病害并给出防治建议</div>
+                </div>
+                <div class="grid-2" style="margin-bottom:20px;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3><i class="fas fa-cloud-upload-alt"></i> 上传叶片图片</h3>
+                            <span class="badge">JPG / PNG / WEBP</span>
+                        </div>
+                        <div class="upload-drop" id="uploadArea">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>点击上传或拖拽叶片照片</p>
+                            <div class="hint">拍摄茶树叶片，AI 将自动识别病虫害</div>
+                        </div>
+                        <input type="file" id="fileInput" accept="image/*" style="display:none;" />
+                        <div id="imagePreview" style="margin-top:12px;display:none;">
+                            <img id="previewImg" class="preview-img" />
+                            <div>
+                                <button class="btn-outline btn-sm" id="clearBtn"><i class="fas fa-times"></i> 清除</button>
+                                <button class="btn-primary btn-sm" id="reRecognizeBtn"><i class="fas fa-redo"></i> 重新识别</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card" style="height:100%;">
+                        <div class="card-header">
+                            <h3><i class="fas fa-robot"></i> AI 识别结果</h3>
+                            <span class="badge" id="aiStatusBadge">等待识别</span>
+                        </div>
+                        <div id="aiDialog" style="min-height:140px;display:flex;flex-direction:column;justify-content:center;align-items:center;color:var(--text-muted);text-align:center;">
+                            <i class="fas fa-comment-dots" style="font-size:32px;margin-bottom:10px;opacity:0.4;"></i>
+                            <p style="font-size:14px;">上传图片后，AI 将自动识别并给出建议</p>
+                            <p style="font-size:12px;margin-top:4px;">🤖 默认使用 DeepSeek deepseek-v4-flash-vision-exp</p>
+                        </div>
+                        <div id="aiResultContainer"></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-history"></i> 识别历史</h3><span class="badge" id="historyCount">最近3条</span></div>
+                    <div id="historyList" style="font-size:13px;color:var(--text-muted);">
+                        <div class="history-item"><span>📷 2026-08-21 14:32 · 茶饼病</span><span class="tag orange">中风险</span></div>
+                        <div class="history-item"><span>📷 2026-08-20 09:15 · 茶小绿叶蝉</span><span class="tag green">低风险</span></div>
+                        <div class="history-item"><span>📷 2026-08-19 16:40 · 炭疽病</span><span class="tag red">高风险</span></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-book-medical"></i> 常见茶树病害图鉴</h3><span class="badge">快速对照</span></div>
+                    <div class="disease-grid" id="diseaseLibrary"></div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 4: Decision ====== -->
+            <section class="page" id="page-decision">
+                <div class="page-header">
+                    <h1><i class="fas fa-robot"></i> 环境预测与智能决策</h1>
+                    <div class="sub">输入环境参数，AI 输出灌溉建议与风险预警</div>
+                    <div class="location-bar"><i class="fas fa-map-pin"></i><span id="decisionLocationText"><span class="loc-spinner"></span> 定位中...</span></div>
+                </div>
+                <div class="card">
+                    <div class="card-header" style="margin-bottom:14px;"><h3><i class="fas fa-bolt"></i> 场景预设</h3><span class="badge">一键套用</span></div>
+                    <div class="preset-grid" id="presetGrid"></div>
+                </div>
+                <div class="card">
+                    <div class="slider-group">
+                        <div class="slider-item">
+                            <label>🌡️ 温度 <span class="val" id="tempVal">26</span> °C</label>
+                            <input type="range" id="tempSlider" min="-5" max="40" value="26" step="0.5">
+                        </div>
+                        <div class="slider-item">
+                            <label>💧 湿度 <span class="val" id="humiVal">72</span> %</label>
+                            <input type="range" id="humiSlider" min="20" max="95" value="72">
+                        </div>
+                        <div class="slider-item">
+                            <label>☀️ 光照 <span class="val" id="lightVal">3200</span> Lux</label>
+                            <input type="range" id="lightSlider" min="100" max="10000" value="3200" step="100">
+                        </div>
+                        <div class="slider-item">
+                            <label>💦 土壤水分 <span class="val" id="soilVal">22</span> %</label>
+                            <input type="range" id="soilSlider" min="5" max="45" value="22" step="0.5">
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button class="btn-primary" id="decisionBtn"><i class="fas fa-wand-magic-sparkles"></i> 生成智能决策</button>
+                        <button class="btn-secondary" id="fetchWeatherBtn"><i class="fas fa-cloud-sun"></i> 加载实时天气</button>
+                    </div>
+                    <div style="font-size:12px;color:var(--text-muted);margin-top:10px;"><i class="fas fa-map-pin"></i> <span id="decisionCoordDisplay">安吉 · 北纬30.64° 东经119.68°</span> <span id="weatherInfo" style="margin-left:12px;">天气数据: 未加载</span></div>
+                </div>
+                <div class="decision-output" id="decisionOutput">
+                    <h3 style="font-size:17px;margin-bottom:10px;"><i class="fas fa-check-circle" style="color:var(--primary);"></i> AI 决策建议</h3>
+                    <div class="advice-text" id="decisionAdvice">加载中...</div>
+                    <div class="risk-summary" id="decisionRisk">⏳ 正在分析环境风险...</div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-clock-rotate-left"></i> 决策历史</h3><span class="badge" id="decisionHistoryBadge">最近4条</span></div>
+                    <ul class="mini-list" id="decisionHistoryList"></ul>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 5: Report ====== -->
+            <section class="page" id="page-report">
+                <div class="page-header">
+                    <h1><i class="fas fa-file-alt"></i> 管理记录与报告</h1>
+                    <div class="sub">自动生成茶园日/周管理报告</div>
+                </div>
+                <div class="tab-bar" id="reportTabs">
+                    <div class="tab active" data-range="day">日报</div>
+                    <div class="tab" data-range="week">周报</div>
+                    <div class="tab" data-range="month">月报</div>
+                </div>
+                <div class="grid-4">
+                    <div class="card"><div class="card-label"><i class="fas fa-clipboard-list" style="color:var(--primary)"></i> 巡检次数</div><div class="card-value" id="rpInspections">--</div><span class="card-change neutral">本期累计</span></div>
+                    <div class="card"><div class="card-label"><i class="fas fa-triangle-exclamation" style="color:#e67e22"></i> 异常事件</div><div class="card-value" id="rpAnomalies">--</div><span class="card-change down">需关注</span></div>
+                    <div class="card"><div class="card-label"><i class="fas fa-circle-check" style="color:var(--primary)"></i> 处理完成率</div><div class="card-value" id="rpHandled">--%</div><span class="card-change up">处置及时</span></div>
+                    <div class="card"><div class="card-label"><i class="fas fa-stopwatch" style="color:#2c7fb8"></i> 平均响应</div><div class="card-value" id="rpResponse">--</div><span class="card-change neutral">从告警到处置</span></div>
+                </div>
+                <div class="card">
+                    <div class="flex-between" style="margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+                        <span style="font-weight:600;font-size:16px;" id="reportTitle">📋 本周茶园健康报告</span>
+                        <span style="font-size:12px;color:var(--text-muted);" id="reportRange">--</span>
+                    </div>
+                    <div class="report-table-wrap">
+                        <table class="report-table">
+                            <thead><tr><th>日期</th><th>环境异常</th><th>AI 建议</th><th>处理记录</th></tr></thead>
+                            <tbody id="reportBody"></tbody>
+                        </table>
+                    </div>
+                    <div class="report-summary">
+                        <span><i class="fas fa-clipboard-check" style="color:var(--primary);"></i> <strong id="reportSummaryText">--</strong></span>
+                        <button class="btn-secondary btn-sm" id="exportReportBtn"><i class="fas fa-file-pdf"></i> 导出PDF</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 6: Tourism ====== -->
+            <section class="page" id="page-tourism">
+                <div class="page-header">
+                    <h1><i class="fas fa-umbrella-beach"></i> 文旅服务</h1>
+                    <div class="sub">茶园微气候 · 扫码观茶 · 智慧导览</div>
+                </div>
+                <div class="grid-2">
+                    <div class="eco-card">
+                        <div class="eco-title"><i class="fas fa-cloud-sun"></i> 茶园微气候</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;">
+                            <div><span class="text-muted text-sm">体感温度</span><div class="eco-value" style="font-size:22px;" id="tourismTemp">--°C</div></div>
+                            <div><span class="text-muted text-sm">空气湿度</span><div class="eco-value" style="font-size:22px;" id="tourismHumi">--%</div></div>
+                            <div><span class="text-muted text-sm">紫外线</span><div class="eco-value" style="font-size:22px;" id="tourismUv">--</div></div>
+                            <div><span class="text-muted text-sm">舒适度</span><div class="eco-value" style="font-size:22px;" id="tourismComfort">--</div></div>
+                        </div>
+                    </div>
+                    <div class="eco-card">
+                        <div class="eco-title"><i class="fas fa-qrcode"></i> 扫码观茶</div>
+                        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                            <div class="qr-placeholder"><i class="fas fa-qrcode"></i></div>
+                            <div>
+                                <div style="font-weight:600;">"这棵茶树的故事"</div>
+                                <div class="text-muted text-sm">扫描二维码，查看茶树生长数据</div>
+                                <span class="tag green" style="margin-top:6px;display:inline-block;">已接入 47 棵</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="eco-card">
+                        <div class="eco-title"><i class="fas fa-route"></i> 游览推荐</div>
+                        <div>
+                            <div style="font-weight:600;font-size:17px;color:var(--primary);">今日最佳：15:00-17:00</div>
+                            <div class="text-muted text-sm">🌤️ 多云转晴 · 适宜茶园漫步</div>
+                            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+                                <span class="tag green">🍃 采茶体验</span>
+                                <span class="tag blue">📸 拍照打卡</span>
+                                <span class="tag orange">☕ 品茶休憩</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="eco-card">
+                        <div class="eco-title"><i class="fas fa-graduation-cap"></i> 安吉白茶小知识</div>
+                        <div>
+                            <div style="font-weight:500;">🍵 安吉白茶为什么是"白"叶茶？</div>
+                            <div class="text-muted text-sm" style="margin-top:4px;line-height:1.6;">春季低温期新梢呈玉白色，氨基酸含量是普通绿茶的2-3倍。</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 7: Industry ====== -->
+            <section class="page" id="page-industry">
+                <div class="page-header">
+                    <h1><i class="fas fa-building-columns"></i> 产业数据服务</h1>
+                    <div class="sub">全区茶园生产数据汇总</div>
+                </div>
+                <div class="grid-4">
+                    <div class="eco-card" style="text-align:center;"><div class="text-muted text-sm">接入茶园</div><div class="eco-value" style="font-size:28px;">47</div><div class="eco-desc">个</div></div>
+                    <div class="eco-card" style="text-align:center;"><div class="text-muted text-sm">服务茶农</div><div class="eco-value" style="font-size:28px;">128</div><div class="eco-desc">户</div></div>
+                    <div class="eco-card" style="text-align:center;"><div class="text-muted text-sm">覆盖面积</div><div class="eco-value" style="font-size:28px;">3,260</div><div class="eco-desc">亩</div></div>
+                    <div class="eco-card" style="text-align:center;"><div class="text-muted text-sm">今日产量预估</div><div class="eco-value" style="font-size:28px;">1,240</div><div class="eco-desc">kg</div></div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div style="font-weight:600;margin-bottom:10px;"><i class="fas fa-building" style="color:var(--primary);"></i> 入驻主体</div>
+                        <div style="display:flex;flex-direction:column;gap:8px;">
+                            <div class="flex-between" style="padding:8px 12px;background:#f6f9fc;border-radius:10px;"><span><i class="fas fa-users" style="color:var(--primary);"></i> 安吉白茶专业合作社</span><span class="tag green">已接入</span></div>
+                            <div class="flex-between" style="padding:8px 12px;background:#f6f9fc;border-radius:10px;"><span><i class="fas fa-store" style="color:var(--primary);"></i> 溪龙茶业有限公司</span><span class="tag green">已接入</span></div>
+                            <div class="flex-between" style="padding:8px 12px;background:#f6f9fc;border-radius:10px;"><span><i class="fas fa-leaf" style="color:var(--primary);"></i> 安吉宋茗白茶</span><span class="tag orange">对接中</span></div>
+                            <div class="flex-between" style="padding:8px 12px;background:#f6f9fc;border-radius:10px;"><span><i class="fas fa-seedling" style="color:var(--primary);"></i> 龙王山茶叶合作社</span><span class="tag green">已接入</span></div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div style="font-weight:600;margin-bottom:10px;"><i class="fas fa-search" style="color:var(--primary);"></i> 溯源查询</div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <input type="text" id="traceInput" placeholder="输入批次号" style="flex:1;padding:10px 16px;border:1px solid var(--border-light);border-radius:12px;font-size:14px;min-width:160px;">
+                            <button class="btn-primary btn-sm" id="traceBtn"><i class="fas fa-search"></i> 查询</button>
+                        </div>
+                        <div id="traceResult" style="margin-top:12px;display:none;padding:14px;background:#f6f9fc;border-radius:12px;font-size:13px;line-height:1.8;">
+                            <div><strong>批次：</strong><span id="traceBatch">AJ20260821-001</span></div>
+                            <div><strong>茶园：</strong>溪龙乡 · 黄杜村 3号地块</div>
+                            <div><strong>采摘日期：</strong>2026-08-20</div>
+                            <div><strong>品质等级：</strong>特级 <span class="tag green">✅ 通过</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 8: Devices ====== -->
+            <section class="page" id="page-devices">
+                <div class="page-header">
+                    <h1><i class="fas fa-microchip"></i> 传感器设备管理</h1>
+                    <div class="sub">实时监控所有传感器状态，与「感知层」架构对应</div>
+                </div>
+                <div class="device-grid" id="deviceGrid"></div>
+                <div class="card" style="margin-top:16px;padding:14px 20px;font-size:13px;color:var(--text-muted);">
+                    <i class="fas fa-info-circle"></i> 共计 <strong id="deviceTotal">6</strong> 台设备 ·
+                    <span style="color:var(--success);">🟢 <span id="deviceOnline">4</span> 在线</span> ·
+                    <span style="color:var(--warning);">🟡 <span id="deviceWarn">1</span> 异常</span> ·
+                    <span style="color:var(--text-muted);">⚫ <span id="deviceOffline">1</span> 离线</span>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 9: Trends ====== -->
+            <section class="page" id="page-trends">
+                <div class="page-header">
+                    <h1><i class="fas fa-chart-line"></i> 历史趋势分析</h1>
+                    <div class="sub">过去7天环境数据变化趋势，使用 Chart.js 绘制</div>
+                </div>
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-temperature-high"></i> 温度 & 湿度趋势</h3><span class="badge">7天</span></div>
+                        <div class="chart-container"><canvas id="tempHumidityChart"></canvas></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-water"></i> 土壤水分 & 光照趋势</h3><span class="badge">7天</span></div>
+                        <div class="chart-container"><canvas id="soilLightChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3><i class="fas fa-table"></i> 详细数据</h3><span class="badge">近7日</span></div>
+                    <div class="report-table-wrap">
+                        <table class="report-table">
+                            <thead><tr><th>日期</th><th>温度 (°C)</th><th>湿度 (%)</th><th>土壤水分 (%)</th><th>光照 (Lux)</th></tr></thead>
+                            <tbody id="trendTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 10: Calendar ====== -->
+            <section class="page" id="page-calendar">
+                <div class="page-header">
+                    <h1><i class="fas fa-calendar-alt"></i> 农事日历</h1>
+                    <div class="sub">全年农事任务管理 · 灌溉 · 施肥 · 打药 · 采摘</div>
+                </div>
+                <div class="card">
+                    <div class="calendar-header">
+                        <button class="nav-btn" id="calPrev"><i class="fas fa-chevron-left"></i></button>
+                        <span class="month-year" id="calMonthYear">2026年 8月</span>
+                        <button class="nav-btn" id="calNext"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                    <div class="calendar-legend">
+                        <span class="legend-item"><span class="legend-dot irrigation"></span> 灌溉</span>
+                        <span class="legend-item"><span class="legend-dot fertilize"></span> 施肥</span>
+                        <span class="legend-item"><span class="legend-dot pesticide"></span> 打药</span>
+                        <span class="legend-item"><span class="legend-dot harvest"></span> 采摘</span>
+                        <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">点击日期添加任务</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== PAGE 11: Settings ====== -->
+            <section class="page" id="page-settings">
+                <div class="settings-section">
+                    <div class="page-header" style="margin-bottom:18px;">
+                        <h1><i class="fas fa-cog"></i> 系统设置</h1>
+                        <div class="sub">配置 AI 接口、高德地图 API 与界面主题</div>
+                    </div>
+
+                    <!-- AI 接口配置 -->
+                    <div class="card" style="margin-bottom:18px;">
+                        <div class="card-header">
+                            <h3><i class="fas fa-plug"></i> AI 识别接口</h3>
+                            <span class="badge" id="connStatusBadge">未连接</span>
+                        </div>
+                        <div class="settings-group">
+                            <div class="field"><label><i class="fas fa-link"></i> API URL</label><input type="text" id="apiUrl" value="https://api.deepseek.com/v1/chat/completions" /></div>
+                            <div class="field"><label><i class="fas fa-tag"></i> 模型名称</label><input type="text" id="apiModel" value="deepseek-v4-flash-vision-exp" /></div>
+                            <div class="field"><label><i class="fas fa-key"></i> API Key</label><input type="password" id="apiKey" placeholder="sk-xxxxxxxx" /></div>
+                            <div class="field"><label><i class="fas fa-server"></i> 代理服务地址</label><input type="text" id="proxyUrl" value="http://localhost:3000" placeholder="http://localhost:3000" /></div>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+                                <button class="btn-primary" id="saveApiBtn"><i class="fas fa-save"></i> 保存配置</button>
+                                <button class="btn-outline" id="testConnBtn"><i class="fas fa-vial"></i> 测试连接</button>
+                                <button class="btn-secondary btn-sm" id="resetDefaultsBtn"><i class="fas fa-undo"></i> 恢复默认</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 高德地图 API -->
+                    <div class="card" style="margin-bottom:18px;">
+                        <div class="card-header">
+                            <h3><i class="fas fa-map-marked-alt"></i> 高德地图 API</h3>
+                            <span class="badge" id="amapStatusBadge">未配置</span>
+                        </div>
+                        <div class="settings-group">
+                            <div class="field">
+                                <label><i class="fas fa-key"></i> 高德 API Key</label>
+                                <input type="password" id="amapKey" placeholder="在高德开放平台申请 Web服务 Key" />
+                            </div>
+                            <div style="font-size:12px;color:var(--text-muted);line-height:1.6;background:#f6f9fc;padding:10px 14px;border-radius:10px;">
+                                <i class="fas fa-info-circle" style="color:var(--primary);"></i> 用于首页驾驶舱实时天气查询与定位。未配置时使用模拟数据。<br>
+                                申请地址：<a href="https://lbs.amap.com/dev/key/app" target="_blank" style="color:var(--primary);">lbs.amap.com/dev/key/app</a> （选「Web服务」类型）
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 主题选择 -->
+                    <div class="card" style="margin-bottom:18px;">
+                        <div class="card-header">
+                            <h3><i class="fas fa-palette"></i> 界面主题</h3>
+                            <span class="badge" id="themeStatusBadge">默认主题</span>
+                        </div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:14px;">点击下方任一主题卡片切换全站配色，12 种风格任你挑选</div>
+                        <div class="theme-grid" id="themeGrid"></div>
+                    </div>
+
+                    <!-- 当前状态 -->
+                    <div class="card">
+                        <div class="card-header"><h3><i class="fas fa-info-circle"></i> 当前状态</h3></div>
+                        <div class="settings-status">
+                            <span class="dot gray" id="statusDot"></span>
+                            <span id="statusText">未配置 API Key</span>
+                            <span style="margin-left:auto;font-size:12px;color:var(--text-muted);" id="statusTime"></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- ====== Toast ====== -->
+    <div class="toast" id="toast"><i class="fas fa-check-circle" id="toastIcon"></i><span id="toastMsg">操作成功</span></div>
+
+    <script>
+        // =============================================================
+        // 模拟数据
+        // =============================================================
+        const SIM_DATA = {
+            temp: 26.8, humi: 68, soil: 22.4, light: 3410,
+            zones: [
+                { id: 'A', name: 'A区 · 溪龙乡', status: 'normal', statusLabel: '正常', soil: 28, temp: 25, area: 1080, advice: '茶树生长状态良好，保持当前管理措施。' },
+                { id: 'B', name: 'B区 · 黄杜村', status: 'water', statusLabel: '缺水', soil: 18, temp: 27, area: 1260, advice: '土壤含水率仅18%，建议今天傍晚开启滴灌系统15分钟。' },
+                { id: 'C', name: 'C区 · 梅溪镇', status: 'pest', statusLabel: '病虫风险', soil: 25, temp: 26, area: 920, advice: '监测到茶饼病早期迹象，建议剪除病叶并喷洒代森锰锌。' }
+            ],
+            sensors: [
+                { id: 'S01', zone: 'A区', type: '土壤水分', value: '28%', battery: 86, status: 'online' },
+                { id: 'S02', zone: 'A区', type: '空气温湿度', value: '25°C/62%', battery: 72, status: 'online' },
+                { id: 'S03', zone: 'B区', type: '土壤水分', value: '18%', battery: 91, status: 'online' },
+                { id: 'S04', zone: 'B区', type: '光照强度', value: '3410 Lux', battery: 54, status: 'lowbattery' },
+                { id: 'S05', zone: 'C区', type: '空气温湿度', value: '26°C/70%', battery: 0, status: 'offline' },
+                { id: 'S06', zone: 'C区', type: '叶面湿度', value: '78%', battery: 68, status: 'online' }
+            ],
+            alertTimeline: [
+                { time: '今日 14:32', zone: 'C区 · 梅溪镇', level: 'pest', text: '叶面湿度持续偏高，疑似茶饼病早期迹象' },
+                { time: '今日 09:15', zone: 'B区 · 黄杜村', level: 'water', text: '土壤含水率降至 18%，触发缺水预警' },
+                { time: '昨日 18:40', zone: 'A区 · 溪龙乡', level: 'info', text: '例行巡检完成，状态正常' },
+                { time: '昨日 06:20', zone: 'C区 · 梅溪镇', level: 'warn', text: '传感器 S05 离线，已派单检修' }
+            ],
+            decisionPresets: [
+                { name: '春季采摘期', icon: 'fa-seedling', temp: 22, humi: 70, light: 5000, soil: 26 },
+                { name: '夏季高温期', icon: 'fa-temperature-high', temp: 34, humi: 55, light: 8000, soil: 20 },
+                { name: '梅雨季', icon: 'fa-cloud-showers-heavy', temp: 26, humi: 92, light: 1500, soil: 35 },
+                { name: '秋茶养护', icon: 'fa-leaf', temp: 19, humi: 65, light: 3500, soil: 24 }
+            ],
+            decisionHistory: [
+                { time: '08-21 08:30', scene: '夏季高温期', result: '建议傍晚滴灌15分钟 · 关注叶斑病', risk: '中' },
+                { time: '08-20 17:10', scene: '梅雨季', result: '高湿预警，开启通风设备 · 喷洒保护性杀菌剂', risk: '高' },
+                { time: '08-19 09:00', scene: '春季采摘期', result: '适宜采摘窗口，建议3日内完成春茶采收', risk: '低' },
+                { time: '08-18 14:20', scene: '秋茶养护', result: '养分补充，建议施有机肥 20kg/亩', risk: '低' }
+            ],
+            reportStats: { inspections: 42, anomalies: 7, handledRate: 86, avgResponse: '1.8h' },
+            diseases: [
+                { name: '茶饼病', risk: '高风险', season: '春/秋', symptom: '嫩叶出现淡黄色水渍状斑点，后凸起成饼状', cure: '剪除病叶 · 代森锰锌喷雾' },
+                { name: '茶炭疽病', risk: '中风险', season: '夏/秋', symptom: '叶缘出现褐色枯斑，后期产生黑色小点', cure: '清除病叶 · 苯醚甲环唑' },
+                { name: '茶小绿叶蝉', risk: '中风险', season: '夏', symptom: '嫩梢萎缩卷曲，叶面出现褐色枯斑', cure: '黄板诱杀 · 噻虫嗪' },
+                { name: '茶尺蠖', risk: '高风险', season: '夏/秋', symptom: '叶片被啃食成缺刻，严重时仅剩叶脉', cure: '灯光诱杀 · 苏云金杆菌' }
+            ],
+            history: [
+                { date: '08-21', anomaly: '土壤偏干', advice: '建议B区傍晚灌溉', action: '已安排明日巡检' },
+                { date: '08-20', anomaly: '正常', advice: '保持当前管理', action: '无' },
+                { date: '08-19', anomaly: '病虫预警', advice: 'C区疑似茶饼病', action: '已采样送检' },
+                { date: '08-18', anomaly: '高湿预警', advice: '湿度>85%，注意病害', action: '开启通风设备' },
+                { date: '08-17', anomaly: '正常', advice: '保持当前管理', action: '无' }
+            ]
+        };
+
+        // 设备数据（设备管理页）
+        const DEVICES = [
+            { id: 'D001', name: '温湿度传感器 #1', type: '温湿度', location: 'A区 · 溪龙乡', status: 'online', lastUpdate: '2026-08-24 08:32:15', value: '26.8°C / 68%' },
+            { id: 'D002', name: '土壤水分传感器 #1', type: '土壤水分', location: 'A区 · 溪龙乡', status: 'online', lastUpdate: '2026-08-24 08:30:22', value: '28.4%' },
+            { id: 'D003', name: '土壤水分传感器 #2', type: '土壤水分', location: 'B区 · 黄杜村', status: 'warning', lastUpdate: '2026-08-24 08:28:10', value: '18.2% (偏低)' },
+            { id: 'D004', name: '光照传感器 #1', type: '光照', location: 'C区 · 梅溪镇', status: 'online', lastUpdate: '2026-08-24 08:31:45', value: '3410 Lux' },
+            { id: 'D005', name: '温湿度传感器 #2', type: '温湿度', location: 'B区 · 黄杜村', status: 'offline', lastUpdate: '2026-08-23 22:15:03', value: '--' },
+            { id: 'D006', name: '虫情监测设备', type: '虫情', location: 'C区 · 梅溪镇', status: 'online', lastUpdate: '2026-08-24 08:29:30', value: '3只 小绿叶蝉' }
+        ];
+
+        // 农事任务（农事日历页）
+        let tasks = [
+            { date: '2026-08-24', type: 'irrigation', label: '灌溉' },
+            { date: '2026-08-25', type: 'fertilize', label: '施肥' },
+            { date: '2026-08-26', type: 'pesticide', label: '打药' },
+            { date: '2026-08-28', type: 'harvest', label: '采摘' },
+            { date: '2026-08-30', type: 'irrigation', label: '灌溉' },
+            { date: '2026-09-01', type: 'fertilize', label: '施肥' },
+            { date: '2026-09-03', type: 'pesticide', label: '打药' }
+        ];
+
+        // =============================================================
+        // 全局状态
+        // =============================================================
+        let currentLat = 30.64, currentLng = 119.68, currentAdcode = '', currentAddress = '浙江省湖州市安吉县';
+        let lastWeather = null;
+        let aiHistory = []; // AI 识别历史记录
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let tempChart = null, soilChart = null; // Chart.js 实例
+
+        // =============================================================
+        // 通用 JSONP（调用高德 API）
+        // =============================================================
+        function jsonp(url, callbackName) {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = url + '&callback=' + callbackName;
+                document.body.appendChild(script);
+                window[callbackName] = function(data) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    resolve(data);
+                };
+                script.onerror = function() {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    reject(new Error('JSONP 请求失败'));
+                };
+            });
+        }
+
+        // 逆地理编码
+        async function reverseGeocode(lat, lng, amapKey) {
+            if (!amapKey) return { address: '浙江省湖州市安吉县', adcode: '330523' };
+            const url = `https://restapi.amap.com/v3/geocode/regeo?location=${lng},${lat}&key=${amapKey}&output=json`;
+            try {
+                const data = await jsonp(url, 'amap_regeo_callback');
+                if (data.status === '1' && data.regeocode) {
+                    return { address: data.regeocode.formatted_address, adcode: data.regeocode.addressComponent.adcode };
+                }
+                throw new Error('逆地理编码失败');
+            } catch (e) {
+                return { address: '浙江省湖州市安吉县', adcode: '330523' };
+            }
+        }
+
+        // 天气查询
+        async function fetchWeatherByAdcode(adcode, amapKey) {
+            if (!amapKey) return null;
+            const url = `https://restapi.amap.com/v3/weather/weatherInfo?city=${adcode}&key=${amapKey}&output=json&extensions=base`;
+            try {
+                const data = await jsonp(url, 'amap_weather_callback');
+                if (data.status === '1' && data.lives && data.lives.length > 0) {
+                    const live = data.lives[0];
+                    return { temp: parseFloat(live.temperature), humi: parseFloat(live.humidity), weather: live.weather, reportTime: live.reporttime };
+                }
+                throw new Error('天气数据为空');
+            } catch (e) { return null; }
+        }
+
+        // 主流程：定位 → 逆地理 → 天气 → 更新 UI
+        async function getLocationAndWeather() {
+            const amapKey = getSettings().amapKey;
+            let lat = 30.64, lng = 119.68, realLocation = false;
+            if (!amapKey) {
+                // 未配置高德 Key，直接使用模拟数据
+                currentAddress = '浙江省湖州市安吉县';
+                updateLocationUI(currentAddress, false);
+                updateWeatherUI(SIM_DATA.temp, SIM_DATA.humi, SIM_DATA.soil, SIM_DATA.light, false);
+                setTag('tempTag', '模拟', 'sim'); setTag('humiTag', '模拟', 'sim'); setTag('soilTag', '模拟', 'sim'); setTag('lightTag', '模拟', 'sim');
+                setValue('dataSource', '模拟数据 (未配置高德 Key)');
+                setValue('weatherInfo', '⚠️ 请在设置中填写高德 API Key');
+                return;
+            }
+            if ("geolocation" in navigator) {
+                try {
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
+                    });
+                    lat = pos.coords.latitude; lng = pos.coords.longitude; realLocation = true;
+                } catch (e) { console.warn('定位失败，使用默认坐标', e); }
+            }
+            currentLat = lat; currentLng = lng;
+            const { address, adcode } = await reverseGeocode(lat, lng, amapKey);
+            currentAddress = address; currentAdcode = adcode;
+            updateLocationUI(address, realLocation);
+
+            const weather = await fetchWeatherByAdcode(adcode, amapKey);
+            lastWeather = weather;
+            if (weather) {
+                updateWeatherUI(weather.temp, weather.humi, SIM_DATA.soil, SIM_DATA.light, true);
+                setTag('tempTag', '真实', 'real'); setTag('humiTag', '真实', 'real'); setTag('soilTag', '模拟', 'sim'); setTag('lightTag', '模拟', 'sim');
+                setValue('dataSource', '高德天气(温度/湿度) + 模拟(土壤/光照)');
+                setValue('weatherInfo', `✅ ${weather.weather || '晴'} · ${weather.reportTime || ''}`);
+            } else {
+                updateWeatherUI(SIM_DATA.temp, SIM_DATA.humi, SIM_DATA.soil, SIM_DATA.light, false);
+                setTag('tempTag', '模拟', 'sim'); setTag('humiTag', '模拟', 'sim'); setTag('soilTag', '模拟', 'sim'); setTag('lightTag', '模拟', 'sim');
+                setValue('dataSource', '模拟数据 (所有指标)');
+                setValue('weatherInfo', '⚠️ 天气 API 不可用');
+            }
+        }
+
+        // =============================================================
+        // UI 辅助函数
+        // =============================================================
+        function setValue(id, text) { const el = document.getElementById(id); if (el) el.textContent = text; }
+        function setTag(id, text, cls) { const el = document.getElementById(id); if (el) { el.textContent = text; el.className = 'data-tag ' + cls; } }
+        function updateLocationUI(address, real) {
+            const display = real ? address : address + ' (默认位置)';
+            ['locationText', 'mapLocationText', 'decisionLocationText'].forEach(id => setValue(id, display));
+            const coord = document.getElementById('decisionCoordDisplay');
+            if (coord) coord.textContent = `${address} · 北纬${currentLat.toFixed(4)}° 东经${currentLng.toFixed(4)}°`;
+        }
+        function updateWeatherUI(temp, humi, soil, light, isReal) {
+            setValue('dTemp', temp + ' °C'); setValue('dHumi', humi + ' %'); setValue('dSoil', soil + ' %'); setValue('dLight', light + ' Lux');
+            setChange('dTempChange', temp, 20, 30); setChange('dHumiChange', humi, 40, 80); setChange('dSoilChange', soil, 20, 35); setChange('dLightChange', light, 1000, 6000);
+            // 文旅微气候
+            setValue('tourismTemp', temp + '°C'); setValue('tourismHumi', humi + '%');
+            let uv = '中等 · 4'; if (temp > 30) uv = '高 · 7'; else if (temp < 15) uv = '低 · 2';
+            setValue('tourismUv', uv);
+            let comfort = '🌿 适宜'; if (temp > 35 || temp < 5) comfort = '⚠️ 不适宜'; else if (temp > 30 || temp < 10) comfort = '🌤️ 较适宜';
+            setValue('tourismComfort', comfort);
+            // 风险提示
+            const alerts = [];
+            if (humi > 80) alerts.push('连续高湿环境，病害风险上升');
+            if (soil < 20) alerts.push('B区土壤含水率偏低，建议重点巡检');
+            if (temp < 5) alerts.push('⚠️ 低温预警！注意防霜冻');
+            if (temp > 35) alerts.push('⚠️ 高温预警！建议开启遮阳');
+            if (alerts.length === 0) alerts.push('当前环境整体良好，继续保持监测');
+            const alertEl = document.getElementById('alertContent');
+            if (alertEl) alertEl.innerHTML = `<strong>AI 风险提示：</strong> ${alerts.slice(0,2).join('；')}`;
+            const tagEl = document.getElementById('alertTag');
+            if (tagEl) tagEl.textContent = alerts.length > 1 ? `${alerts.length}项预警` : '正常';
+            // 传感器在线数
+            const sensor = document.getElementById('sensorCount');
+            if (sensor) sensor.textContent = 4 + Math.floor(Math.random() * 3);
+            // 同步决策滑块
+            syncSlider('temp', temp); syncSlider('humi', humi); syncSlider('soil', soil); syncSlider('light', light);
+            // 更新首页速览
+            updateZoneQuickView(temp, humi, soil);
+            // 更新待办
+            updateTodoList(alerts);
+        }
+        function setChange(elId, val, low, high) {
+            const el = document.getElementById(elId); if (!el) return;
+            if (val < low) { el.className = 'card-change down'; el.textContent = '偏低'; }
+            else if (val > high) { el.className = 'card-change warn'; el.textContent = '偏高'; }
+            else { el.className = 'card-change up'; el.textContent = '适宜'; }
+        }
+        function syncSlider(id, val) {
+            const slider = document.getElementById(id + 'Slider');
+            const valSpan = document.getElementById(id + 'Val');
+            if (slider) slider.value = val;
+            if (valSpan) valSpan.textContent = (typeof val === 'number' && val % 1 !== 0) ? val.toFixed(1) : val;
+        }
+        function updateZoneQuickView(temp, humi, soil) {
+            const container = document.getElementById('zoneQuickView');
+            if (!container) return;
+            container.innerHTML = SIM_DATA.zones.map(z => {
+                const colorMap = { normal: 'var(--success)', water: 'var(--danger)', pest: 'var(--warning)' };
+                const labelMap = { normal: '正常', water: '缺水风险', pest: '病虫风险' };
+                return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border-light);">
+                    <span>${z.id}区 <span style="color:${colorMap[z.status]};">●</span> ${labelMap[z.status]}</span>
+                    <span style="color:var(--text-muted);font-size:12px;">${z.temp}°C · 土壤${z.soil}%</span>
+                </div>`;
+            }).join('') || '<div style="text-align:center;color:var(--text-muted);font-size:13px;">加载中...</div>';
+        }
+        function updateTodoList(alerts) {
+            const list = document.getElementById('todoList');
+            const count = document.getElementById('todoCount');
+            if (!list) return;
+            const todos = [];
+            if (alerts.length > 1 || (alerts[0] && alerts[0].includes('预警'))) todos.push({ icon: 'fa-exclamation-circle', color: 'var(--warning)', text: '环境异常巡检' });
+            todos.push({ icon: 'fa-clock', color: 'var(--warning)', text: 'C区病虫害复查' });
+            todos.push({ icon: 'fa-tint', color: 'var(--info)', text: 'B区土壤水分监测' });
+            list.innerHTML = todos.map(t => `<li style="display:flex;gap:10px;align-items:center;padding:4px 0;border-bottom:1px solid var(--border-light);"><i class="fas ${t.icon}" style="color:${t.color};"></i> ${t.text}</li>`).join('');
+            if (count) count.textContent = todos.length + '项';
+        }
+
+        // =============================================================
+        // 导航 & 时钟
+        // =============================================================
+        const navLinks = document.querySelectorAll('.nav-item[data-page], .nav-link[data-page]');
+        const pageTitles = {
+            dashboard: '首页<span>驾驶舱</span>', map: '数字<span>地图</span>', ai: 'AI<span>病虫害识别</span>',
+            decision: '智能<span>决策</span>', report: '管理<span>报告</span>',
+            tourism: '文旅<span>服务</span>', industry: '产业<span>数据</span>',
+            devices: '设备<span>管理</span>', trends: '历史<span>趋势</span>', calendar: '农事<span>日历</span>',
+            settings: '设置 · <span>API</span>'
+        };
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                goToPage(this.dataset.page);
+            });
+        });
+        // 顶部导航 Logo 点击回首页
+        document.querySelectorAll('.nav-logo[data-page]').forEach(el => {
+            el.addEventListener('click', () => goToPage(el.dataset.page));
+        });
+        // 汉堡菜单切换（移动端）
+        const hamburger = document.getElementById('navHamburger');
+        if (hamburger) hamburger.addEventListener('click', () => document.body.classList.toggle('nav-open'));
+        // 分组标题点击展开（移动端）
+        document.querySelectorAll('.nav-group-title').forEach(t => {
+            t.addEventListener('click', function() {
+                const grp = document.getElementById(this.dataset.group);
+                if (!grp) return;
+                if (window.innerWidth <= 900) {
+                    grp.classList.toggle('open');
+                    document.querySelectorAll('.nav-group.open').forEach(g => { if (g !== grp) g.classList.remove('open'); });
+                }
+            });
+        });
+        // 通用页面跳转：导航与工作台卡片共用
+        function goToPage(page) {
+            if (!page || !pageTitles[page]) return;
+            navLinks.forEach(l => l.classList.toggle('active', l.dataset.page === page));
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById('page-' + page);
+            if (target) target.classList.add('active');
+            const titleEl = document.getElementById('pageTitle');
+            if (titleEl) titleEl.innerHTML = pageTitles[page];
+            // 按需渲染动态页面
+            if (page === 'devices') renderDevices();
+            if (page === 'calendar') renderCalendar();
+            if (page === 'trends') setTimeout(renderTrends, 100);
+            // 移动端：跳转后收起导航菜单
+            if (window.innerWidth <= 900) document.body.classList.remove('nav-open');
+            // 滚动到顶部
+            const main = document.querySelector('.main .content');
+            if (main) main.scrollTop = 0;
+        }
+        // 工作台功能卡片：点击跳转到对应板块
+        document.querySelectorAll('.func-card[data-goto]').forEach(card => {
+            card.addEventListener('click', function() {
+                const page = this.dataset.goto;
+                goToPage(page);
+                const title = (pageTitles[page] || '').replace(/<[^>]+>/g, '');
+                showToast('已跳转：' + title, 'success');
+            });
+        });
+        function updateClock() {
+            const now = new Date();
+            const s = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0') + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0') + ':' + String(now.getSeconds()).padStart(2, '0');
+            setValue('clockDisplay', '🕒 ' + s);
+            setValue('liveTime', s.slice(0, 16));
+            setValue('updateTime', s.slice(0, 16));
+        }
+        updateClock(); setInterval(updateClock, 1000);
+
+        // =============================================================
+        // 数字地图渲染
+        // =============================================================
+        function renderZones() {
+            const container = document.getElementById('zoneContainer');
+            if (!container) return;
+            // 同步工作台区域数
+            const wbZone = document.getElementById('wbZoneCount');
+            if (wbZone) wbZone.textContent = SIM_DATA.zones.length + ' 个区域';
+            container.innerHTML = '';
+            SIM_DATA.zones.forEach(z => {
+                const card = document.createElement('div');
+                card.className = 'zone-card';
+                card.innerHTML = `
+                    <div class="zone-name">📍 ${z.name}</div>
+                    <div class="zone-sub">实时监测</div>
+                    <span class="status-badge ${z.status}">${z.statusLabel}</span>
+                    <div class="zone-data">土壤: ${z.soil}% · 温度: ${z.temp}°C</div>
+                    <div class="click-hint"><i class="fas fa-hand-pointer"></i> 点击查看建议</div>`;
+                card.addEventListener('click', () => alert(`📍 ${z.name}\n状态: ${z.statusLabel}\n\n📌 处理建议:\n${z.advice}`));
+                container.appendChild(card);
+            });
+            // 地图概览统计
+            const totalArea = SIM_DATA.zones.reduce((s, z) => s + (z.area || 0), 0);
+            const online = SIM_DATA.sensors.filter(s => s.status === 'online').length;
+            const alerts = SIM_DATA.zones.filter(z => z.status !== 'normal').length;
+            const healthy = SIM_DATA.zones.filter(z => z.status === 'normal').length;
+            setValue('mapTotalArea', totalArea.toLocaleString() + ' 亩');
+            setValue('mapSensorOnline', online + '/' + SIM_DATA.sensors.length);
+            setValue('mapSensorRate', '在线率 ' + Math.round(online / SIM_DATA.sensors.length * 100) + '%');
+            setValue('mapAlertCount', alerts);
+            setValue('mapHealthyZones', healthy);
+            setValue('sensorTotalBadge', SIM_DATA.sensors.length + ' 台');
+        }
+
+        // 传感器分布表
+        function renderSensors() {
+            const tbody = document.getElementById('sensorTableBody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+            SIM_DATA.sensors.forEach(s => {
+                const stMap = { online: ['online', '在线'], lowbattery: ['lowbattery', '低电'], offline: ['offline', '离线'] };
+                const [dotCls, stLabel] = stMap[s.status] || stMap.online;
+                const battCls = s.status === 'offline' ? 'off' : (s.battery < 60 ? 'low' : '');
+                const battColor = s.status === 'offline' ? '#bbb' : (s.battery < 60 ? '#e67e22' : 'var(--primary)');
+                tbody.innerHTML += `<tr>
+                    <td><strong>${s.id}</strong></td>
+                    <td>${s.zone}</td>
+                    <td>${s.type}</td>
+                    <td>${s.value}</td>
+                    <td><span class="sensor-batt ${battCls}"><span class="batt-bar"><i style="width:${Math.max(s.battery,0)}%;background:${battColor}"></i></span>${s.battery>0?s.battery+'%':'--'}</span></td>
+                    <td><span class="status-dot ${dotCls}"></span>${stLabel}</td>
+                </tr>`;
+            });
+        }
+
+        // 告警时间线
+        function renderAlertTimeline() {
+            const box = document.getElementById('alertTimeline');
+            if (!box) return;
+            box.innerHTML = '';
+            SIM_DATA.alertTimeline.forEach(a => {
+                box.innerHTML += `<div class="tl-item ${a.level}">
+                    <div class="tl-time">${a.time}</div>
+                    <div class="tl-zone">${a.zone}</div>
+                    <div class="tl-text">${a.text}</div>
+                </div>`;
+            });
+        }
+
+        // 病害图鉴
+        function renderDiseaseLibrary() {
+            const grid = document.getElementById('diseaseLibrary');
+            if (!grid) return;
+            grid.innerHTML = '';
+            SIM_DATA.diseases.forEach(d => {
+                const rcls = d.risk === '高风险' ? 'red' : (d.risk === '中风险' ? 'orange' : 'green');
+                grid.innerHTML += `<div class="disease-card">
+                    <div class="dc-head"><span class="dc-name">${d.name}</span><span class="tag ${rcls}">${d.risk}</span></div>
+                    <div class="dc-row"><b>高发季：</b>${d.season}</div>
+                    <div class="dc-row"><b>症状：</b>${d.symptom}</div>
+                    <div class="dc-row"><b>防治：</b>${d.cure}</div>
+                </div>`;
+            });
+        }
+
+        // 决策预设 + 历史
+        function renderPresets() {
+            const grid = document.getElementById('presetGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            SIM_DATA.decisionPresets.forEach(p => {
+                const btn = document.createElement('div');
+                btn.className = 'preset-btn';
+                btn.innerHTML = `<i class="fas ${p.icon}"></i><span class="pn">${p.name}</span><span class="pp">${p.temp}°C · ${p.humi}%</span>`;
+                btn.addEventListener('click', () => {
+                    const set = (id, v) => { const el = document.getElementById(id); if (el) { el.value = v; el.dispatchEvent(new Event('input')); } };
+                    set('tempSlider', p.temp); set('humiSlider', p.humi); set('lightSlider', p.light); set('soilSlider', p.soil);
+                    showToast('已套用预设：' + p.name, 'success');
+                });
+                grid.appendChild(btn);
+            });
+        }
+        function renderDecisionHistory() {
+            const ul = document.getElementById('decisionHistoryList');
+            if (!ul) return;
+            ul.innerHTML = '';
+            SIM_DATA.decisionHistory.forEach(h => {
+                ul.innerHTML += `<li>
+                    <span class="ml-time">${h.time}</span>
+                    <div class="ml-main"><div class="ml-scene">${h.scene}</div><div class="ml-result">${h.result}</div></div>
+                    <span class="risk-pill ${h.risk}">${h.risk}风险</span>
+                </li>`;
+            });
+        }
+
+        // =============================================================
+        // 设备管理渲染
+        // =============================================================
+        function renderDevices() {
+            const grid = document.getElementById('deviceGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            DEVICES.forEach(d => {
+                const statusMap = { online: '🟢 在线', offline: '⚫ 离线', warning: '🟡 异常' };
+                const statusClass = { online: 'online', offline: 'offline', warning: 'warning' };
+                const card = document.createElement('div');
+                card.className = 'device-card';
+                card.innerHTML = `
+                    <div class="device-top">
+                        <div><div class="device-name">${d.name}</div><div class="device-type">${d.type} · ${d.location}</div></div>
+                        <span class="device-status ${statusClass[d.status]}">${statusMap[d.status]}</span>
+                    </div>
+                    <div class="device-meta">
+                        <div><i class="fas fa-hashtag"></i> ${d.id}</div>
+                        <div><i class="fas fa-clock"></i> 最后更新: ${d.lastUpdate}</div>
+                        <div><i class="fas fa-chart-simple"></i> 当前值: ${d.value}</div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+            const online = DEVICES.filter(d => d.status === 'online').length;
+            const warn = DEVICES.filter(d => d.status === 'warning').length;
+            const offline = DEVICES.filter(d => d.status === 'offline').length;
+            setValue('deviceTotal', DEVICES.length);
+            setValue('deviceOnline', online);
+            setValue('deviceWarn', warn);
+            setValue('deviceOffline', offline);
+            const badge = document.querySelector('.nav-link[data-page="devices"] .badge-count, .nav-item[data-page="devices"] .badge-count');
+            if (badge) badge.textContent = DEVICES.length;
+            const wbDevice = document.getElementById('wbDeviceCount');
+            if (wbDevice) wbDevice.textContent = DEVICES.length + ' 台设备';
+        }
+
+        // =============================================================
+        // 历史趋势图表
+        // =============================================================
+        function generateTrendData() {
+            const dates = [], temps = [], humis = [], soils = [], lights = [];
+            const now = new Date();
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(d.getDate() - i);
+                dates.push((d.getMonth() + 1) + '/' + d.getDate());
+                temps.push((22 + Math.random() * 8).toFixed(1));
+                humis.push((55 + Math.random() * 30).toFixed(1));
+                soils.push((18 + Math.random() * 18).toFixed(1));
+                lights.push((2000 + Math.random() * 3000).toFixed(0));
+            }
+            return { dates, temps, humis, soils, lights };
+        }
+
+        function renderTrends() {
+            if (typeof Chart === 'undefined') return;
+            const data = generateTrendData();
+            const tbody = document.getElementById('trendTableBody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                for (let i = 0; i < data.dates.length; i++) {
+                    tbody.innerHTML += `<tr><td>${data.dates[i]}</td><td>${data.temps[i]}</td><td>${data.humis[i]}</td><td>${data.soils[i]}</td><td>${data.lights[i]}</td></tr>`;
+                }
+            }
+            const ctx1 = document.getElementById('tempHumidityChart');
+            if (ctx1) {
+                if (tempChart) tempChart.destroy();
+                tempChart = new Chart(ctx1.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [
+                            { label: '温度 (°C)', data: data.temps, borderColor: '#e67e22', backgroundColor: 'rgba(230,126,34,0.1)', fill: true, tension: 0.4, pointRadius: 4 },
+                            { label: '湿度 (%)', data: data.humis, borderColor: '#2c7fb8', backgroundColor: 'rgba(44,127,184,0.1)', fill: true, tension: 0.4, pointRadius: 4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: false } } }
+                });
+            }
+            const ctx2 = document.getElementById('soilLightChart');
+            if (ctx2) {
+                if (soilChart) soilChart.destroy();
+                soilChart = new Chart(ctx2.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: data.dates,
+                        datasets: [
+                            { label: '土壤水分 (%)', data: data.soils, borderColor: '#1a7a4c', backgroundColor: 'rgba(26,122,76,0.1)', fill: true, tension: 0.4, pointRadius: 4 },
+                            { label: '光照 (Lux)', data: data.lights, borderColor: '#f39c12', backgroundColor: 'rgba(243,156,18,0.1)', fill: true, tension: 0.4, pointRadius: 4, yAxisID: 'y1' }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { position: 'top' } },
+                        scales: { y: { beginAtZero: false, position: 'left' }, y1: { beginAtZero: false, position: 'right', grid: { drawOnChartArea: false } } }
+                    }
+                });
+            }
+        }
+
+        // =============================================================
+        // 农事日历
+        // =============================================================
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            const monthYear = document.getElementById('calMonthYear');
+            if (!grid) return;
+            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(currentYear, currentMonth, 0).getDate();
+            const monthNames = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+            monthYear.textContent = currentYear + '年 ' + monthNames[currentMonth];
+            const today = new Date();
+            const todayStr = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            let html = '';
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            weekDays.forEach(d => { html += `<div class="day-header">${d}</div>`; });
+            for (let i = firstDay - 1; i >= 0; i--) {
+                html += `<div class="day-cell other-month">${daysInPrevMonth - i}</div>`;
+            }
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateStr = currentYear + '-' + String(currentMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+                const isToday = dateStr === todayStr;
+                const dayTasks = tasks.filter(t => t.date === dateStr);
+                let dots = '';
+                dayTasks.forEach(t => {
+                    const cls = { irrigation: 'irrigation', fertilize: 'fertilize', pesticide: 'pesticide', harvest: 'harvest' }[t.type] || '';
+                    dots += `<span class="task-dot ${cls}"></span>`;
+                });
+                html += `<div class="day-cell ${isToday ? 'today' : ''}" data-date="${dateStr}">
+                    ${d}
+                    ${dots ? `<div class="task-dots">${dots}</div>` : ''}
+                </div>`;
+            }
+            const totalCells = firstDay + daysInMonth;
+            const remaining = (7 - totalCells % 7) % 7;
+            for (let d = 1; d <= remaining; d++) {
+                html += `<div class="day-cell other-month">${d}</div>`;
+            }
+            grid.innerHTML = html;
+            grid.querySelectorAll('.day-cell:not(.other-month)').forEach(cell => {
+                cell.addEventListener('click', function() {
+                    const date = this.dataset.date;
+                    if (!date) return;
+                    const types = [
+                        { type: 'irrigation', label: '💧 灌溉' },
+                        { type: 'fertilize', label: '🌱 施肥' },
+                        { type: 'pesticide', label: '🧪 打药' },
+                        { type: 'harvest', label: '🌾 采摘' }
+                    ];
+                    const existing = tasks.filter(t => t.date === date);
+                    let msg = `📅 ${date}\n当前任务: ${existing.length > 0 ? existing.map(t => t.label).join(', ') : '无'}\n\n点击选择添加任务:`;
+                    types.forEach((t, i) => { msg += `\n${i+1}. ${t.label}`; });
+                    msg += '\n\n输入编号 (1-4) 添加，或 0 取消';
+                    const choice = prompt(msg);
+                    if (choice === null || choice === '0') return;
+                    const num = parseInt(choice);
+                    if (num >= 1 && num <= 4) {
+                        const selected = types[num - 1];
+                        if (!existing.some(t => t.type === selected.type)) {
+                            tasks.push({ date, type: selected.type, label: selected.label.replace(/[^\u4e00-\u9fa5]/g, '') });
+                            showToast(`✅ 已添加任务: ${selected.label} (${date})`, 'success');
+                            renderCalendar();
+                        } else {
+                            showToast('⚠️ 该任务已存在', 'warning');
+                        }
+                    }
+                });
+            });
+        }
+
+        // =============================================================
+        // 报告渲染（含标签页与统计）
+        // =============================================================
+        const REPORT_RANGES = {
+            day: { title: '📋 今日茶园管理日报', range: '2026年8月21日', factor: 1 },
+            week: { title: '📋 本周茶园健康报告', range: '2026年8月15日 — 8月21日', factor: 5 },
+            month: { title: '📋 8月茶园经营月报', range: '2026年8月1日 — 8月21日', factor: 20 }
+        };
+        let currentReportRange = 'week';
+        function renderReport(range) {
+            range = range || currentReportRange;
+            currentReportRange = range;
+            const cfg = REPORT_RANGES[range] || REPORT_RANGES.week;
+            setValue('reportTitle', cfg.title);
+            const tbody = document.getElementById('reportBody');
+            if (tbody) {
+                tbody.innerHTML = '';
+                SIM_DATA.history.forEach(row => {
+                    const cls = { '土壤偏干': 'water', '正常': 'normal', '病虫预警': 'pest', '高湿预警': 'warn' }[row.anomaly] || 'normal';
+                    tbody.innerHTML += `<tr><td>${row.date}</td><td><span class="status-badge ${cls}" style="font-size:11px;padding:2px 10px;">${row.anomaly}</span></td><td>${row.advice}</td><td>${row.action}</td></tr>`;
+                });
+            }
+            const s = SIM_DATA.reportStats;
+            const f = cfg.factor;
+            setValue('rpInspections', s.inspections * f);
+            setValue('rpAnomalies', s.anomalies * f);
+            setValue('rpHandled', s.handledRate + '%');
+            setValue('rpResponse', s.avgResponse);
+            const total = SIM_DATA.history.filter(r => r.anomaly !== '正常').length;
+            setValue('reportSummaryText', `本期处理 ${total * f} 次预警，处置完成率 ${s.handledRate}%`);
+            setValue('reportRange', cfg.range);
+            // 标签页激活态
+            document.querySelectorAll('#reportTabs .tab').forEach(t => t.classList.toggle('active', t.dataset.range === range));
+        }
+
+        // =============================================================
+        // Toast
+        // =============================================================
+        let toastTimer;
+        function showToast(msg, type = 'success') {
+            const t = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msgEl = document.getElementById('toastMsg');
+            t.className = 'toast';
+            icon.className = 'fas fa-' + (type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle');
+            icon.style.color = type === 'error' ? '#ff6b6b' : type === 'info' ? '#74b9ff' : '#6bc7a0';
+            msgEl.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        // =============================================================
+        // AI 识别（真实调用后端代理 → DeepSeek API）
+        // =============================================================
+        let uploadedFile = null;
+
+        function getSettings() {
+            return {
+                apiKey: document.getElementById('apiKey').value.trim(),
+                apiUrl: document.getElementById('apiUrl').value.trim() || 'https://api.deepseek.com/v1/chat/completions',
+                model: document.getElementById('apiModel').value.trim() || 'deepseek-v4-flash-vision-exp',
+                proxyUrl: document.getElementById('proxyUrl').value.trim() || 'http://localhost:3000',
+                amapKey: document.getElementById('amapKey').value.trim()
+            };
+        }
+
+        async function callAIIdentify(file) {
+            const dialog = document.getElementById('aiDialog');
+            const container = document.getElementById('aiResultContainer');
+            const badge = document.getElementById('aiStatusBadge');
+            const { apiKey, apiUrl, model, proxyUrl } = getSettings();
+
+            if (!apiKey) {
+                showToast('⚠️ 请先在「设置」中填写 API Key', 'error');
+                // 自动切到设置页
+                goToPage('settings');
+                return;
+            }
+
+            dialog.style.display = 'none';
+            container.innerHTML = `
+                <div style="padding:16px;background:#f6fafd;border-radius:12px;border-left:4px solid var(--primary);">
+                    <div style="display:flex;gap:12px;align-items:center;">
+                        <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-gradient);color:#fff;display:flex;align-items:center;justify-content:center;"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <div style="font-weight:600;font-size:14px;">AI 识别中</div>
+                            <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">🤖 正在调用 DeepSeek API...</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:10px;">
+                        <span class="shimmer" style="width:80px;height:14px;display:inline-block;"></span>
+                        <span class="shimmer" style="width:120px;height:14px;display:inline-block;margin-left:6px;"></span>
+                        <span class="shimmer" style="width:90px;height:14px;display:inline-block;margin-left:6px;"></span>
+                    </div>
+                </div>`;
+            badge.textContent = '识别中…';
+            badge.style.background = '#fff3e0';
+            badge.style.color = 'var(--warning)';
+
+            try {
+                const formData = new FormData();
+                formData.append('image', file);
+                formData.append('apiKey', apiKey);
+                formData.append('apiUrl', apiUrl);
+                formData.append('model', model);
+                formData.append('temperature', '0.7');
+                formData.append('maxTokens', '1024');
+
+                const response = await fetch(`${proxyUrl}/api/recognize`, { method: 'POST', body: formData });
+                const result = await response.json();
+
+                if (!result.success) throw new Error(result.error || '识别失败');
+
+                const data = result.data;
+                const levelMap = { '低': '🟢 低风险', '中': '🟡 中风险', '高': '🔴 高风险' };
+                const levelClass = { '低': 'low', '中': 'mid', '高': 'high' };
+                const lc = levelClass[data.level] || 'mid';
+
+                container.innerHTML = `
+                    <div style="padding:16px;background:#f6fafd;border-radius:12px;border-left:4px solid var(--primary);">
+                        <div style="display:flex;gap:12px;align-items:flex-start;">
+                            <div style="width:36px;height:36px;border-radius:50%;background:var(--primary-gradient);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-robot"></i></div>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;font-size:14px;">AI 识别结果 <span style="font-size:11px;color:var(--text-muted);font-weight:400;">${new Date().toLocaleTimeString()}</span></div>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                                    <span class="tag green">🪴 ${data.name || '识别结果'}</span>
+                                    <span class="risk-tag ${lc}" style="font-size:12px;padding:2px 12px;">${levelMap[data.level] || '🟡 中风险'}</span>
+                                </div>
+                                <div style="margin-top:8px;font-size:13px;line-height:1.7;color:var(--text-secondary);">
+                                    <p style="margin-bottom:6px;"><strong>📝 描述：</strong>${data.description || '无详细描述'}</p>
+                                    <p><strong>🌿 防治建议：</strong>${data.advice || '建议咨询专业农技人员'}</p>
+                                </div>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                                    <span class="tag" style="background:var(--primary-light);color:var(--primary-dark);"><i class="fas fa-flag"></i> 风险等级 ${data.level || '中'}</span>
+                                    <span class="tag" style="background:var(--primary-light);color:var(--primary-dark);"><i class="fas fa-microchip"></i> ${result.model || model}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                badge.textContent = '识别完成 ✓';
+                badge.style.background = '#e3f5ec';
+                badge.style.color = 'var(--success)';
+                showToast(`✅ 识别完成：${data.name || '完成'}`, data.level === '高' ? 'error' : 'success');
+
+                // 加入历史
+                addHistory(data.name || '识别结果', data.level || '中');
+            } catch (error) {
+                console.error('识别错误:', error);
+                container.innerHTML = `
+                    <div style="padding:16px;background:#fdeef0;border-radius:12px;border-left:4px solid var(--danger);">
+                        <div style="display:flex;gap:12px;align-items:flex-start;">
+                            <div style="width:36px;height:36px;border-radius:50%;background:var(--danger);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fas fa-exclamation"></i></div>
+                            <div style="flex:1;">
+                                <div style="font-weight:600;font-size:14px;color:var(--danger);">识别失败</div>
+                                <div style="font-size:13px;color:var(--text-secondary);margin-top:6px;line-height:1.6;">${error.message || '请检查 API 配置和网络连接'}</div>
+                                <div style="margin-top:8px;">
+                                    <span class="tag red"><i class="fas fa-exclamation-triangle"></i> 请检查设置或后端服务是否启动</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                badge.textContent = '识别失败';
+                badge.style.background = '#fde8e8';
+                badge.style.color = 'var(--danger)';
+                showToast(`❌ 识别失败: ${error.message}`, 'error');
+            }
+        }
+
+        function addHistory(name, level) {
+            aiHistory.unshift({ name, level, time: new Date() });
+            if (aiHistory.length > 5) aiHistory.pop();
+            const list = document.getElementById('historyList');
+            if (!list) return;
+            list.innerHTML = aiHistory.map(h => {
+                const cls = h.level === '高' ? 'red' : h.level === '中' ? 'orange' : 'green';
+                const t = h.time;
+                const ds = `${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')} ${String(t.getHours()).padStart(2, '0')}:${String(t.getMinutes()).padStart(2, '0')}`;
+                return `<div class="history-item"><span>📷 ${ds} · ${h.name}</span><span class="tag ${cls}">${h.level}风险</span></div>`;
+            }).join('');
+            // 如果不足 3 条，补上原有模拟历史
+            if (aiHistory.length < 3) {
+                list.innerHTML += [
+                    { name: '茶饼病', level: '中', time: '08-21 14:32' },
+                    { name: '茶小绿叶蝉', level: '低', time: '08-20 09:15' },
+                    { name: '炭疽病', level: '高', time: '08-19 16:40' }
+                ].slice(0, 3 - aiHistory.length).map(h => {
+                    const cls = h.level === '高' ? 'red' : h.level === '中' ? 'orange' : 'green';
+                    return `<div class="history-item"><span>📷 ${h.time} · ${h.name}</span><span class="tag ${cls}">${h.level}风险</span></div>`;
+                }).join('');
+            }
+            setValue('historyCount', `最近${Math.max(aiHistory.length, 3)}条`);
+        }
+
+        function handleFileUpload(file) {
+            if (!file) return;
+            uploadedFile = file;
+            const reader = new FileReader();
+            reader.onload = function(ev) {
+                document.getElementById('previewImg').src = ev.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('uploadArea').style.display = 'none';
+                callAIIdentify(file);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearUpload() {
+            uploadedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('aiResultContainer').innerHTML = '';
+            document.getElementById('aiDialog').style.display = 'flex';
+            const badge = document.getElementById('aiStatusBadge');
+            badge.textContent = '等待识别';
+            badge.style.background = 'var(--primary-light)';
+            badge.style.color = 'var(--primary)';
+        }
+
+        // 事件绑定：上传
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        if (uploadArea) {
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+            uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+            uploadArea.addEventListener('drop', e => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) handleFileUpload(e.dataTransfer.files[0]);
+            });
+        }
+        if (fileInput) fileInput.addEventListener('change', e => handleFileUpload(e.target.files[0]));
+        document.getElementById('clearBtn').addEventListener('click', clearUpload);
+        document.getElementById('reRecognizeBtn').addEventListener('click', () => { if (uploadedFile) callAIIdentify(uploadedFile); });
+
+        // =============================================================
+        // 智能决策
+        // =============================================================
+        ['temp', 'humi', 'light', 'soil'].forEach(id => {
+            const slider = document.getElementById(id + 'Slider');
+            const val = document.getElementById(id + 'Val');
+            if (slider && val) slider.addEventListener('input', () => val.textContent = slider.value);
+        });
+
+        document.getElementById('decisionBtn').addEventListener('click', function() {
+            const temp = parseFloat(document.getElementById('tempSlider').value);
+            const humi = parseFloat(document.getElementById('humiSlider').value);
+            const light = parseFloat(document.getElementById('lightSlider').value);
+            const soil = parseFloat(document.getElementById('soilSlider').value);
+            const adv = [];
+            if (soil < 20) adv.push('🌱 土壤水分偏低，建议立即开启滴灌系统。');
+            else if (soil > 35) adv.push('🌱 土壤水分过高，建议暂停灌溉，注意排水。');
+            else adv.push('🌱 土壤水分适宜，保持当前灌溉节奏。');
+            if (humi > 80) adv.push('💧 空气湿度偏高，注意通风，预防病害。');
+            else if (humi < 40) adv.push('💧 空气干燥，建议叶面喷雾增湿。');
+            if (temp < 5) adv.push('❄️ 温度低于5°C，存在霜冻风险！建议覆盖防冻膜。');
+            else if (temp > 35) adv.push('☀️ 高温超过35°C，建议搭建遮阳网。');
+            if (light > 7000) adv.push('☀️ 光照过强，建议11:00-15:00开启遮阳。');
+            let risk = '低', msg = '✅ 当前环境风险较低。';
+            if (temp < 5 || temp > 35 || soil < 15 || humi > 85) { risk = '高'; msg = '⚠️ 存在极端环境风险，建议立即应对！'; }
+            else if (humi > 75 && temp > 22 && temp < 30) { risk = '中'; msg = '⚠️ 高温高湿，茶饼病风险较高，建议AI巡检。'; }
+
+            const btn = this;
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<span class="loading-spinner"></span> 分析中...';
+            btn.disabled = true;
+            setTimeout(() => {
+                document.getElementById('decisionOutput').classList.add('show');
+                setValue('decisionAdvice', adv.join('\n'));
+                document.getElementById('decisionRisk').innerHTML = `<strong>🚨 风险等级：${risk}</strong> · ${msg}`;
+                btn.innerHTML = orig;
+                btn.disabled = false;
+                showToast('✅ 决策建议已生成', 'success');
+            }, 600);
+        });
+
+        // 加载实时天气按钮
+        document.getElementById('fetchWeatherBtn').addEventListener('click', async function() {
+            this.innerHTML = '<span class="loading-spinner" style="border-top-color:var(--text-secondary);"></span> 加载中...';
+            this.disabled = true;
+            await getLocationAndWeather();
+            this.innerHTML = '<i class="fas fa-cloud-sun"></i> 加载实时天气';
+            this.disabled = false;
+            showToast('✅ 天气数据已刷新', 'success');
+        });
+
+        // 首页刷新按钮
+        document.getElementById('refreshBtn').addEventListener('click', async function() {
+            this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> 刷新中';
+            await getLocationAndWeather();
+            this.innerHTML = '<i class="fas fa-sync-alt"></i> 刷新';
+            showToast('✅ 数据已刷新', 'success');
+        });
+
+        // 报告导出
+        document.getElementById('exportReportBtn').addEventListener('click', () => showToast('📄 报告导出中（演示功能）', 'info'));
+
+        // 溯源
+        function handleTrace() {
+            const input = document.getElementById('traceInput');
+            const batch = input.value.trim() || 'AJ20260821-001';
+            setValue('traceBatch', batch);
+            document.getElementById('traceResult').style.display = 'block';
+            showToast(`✅ 已查询批次: ${batch}`, 'success');
+        }
+        document.getElementById('traceBtn').addEventListener('click', handleTrace);
+        document.getElementById('traceInput').addEventListener('keydown', e => { if (e.key === 'Enter') handleTrace(); });
+
+        // =============================================================
+        // Settings
+        // =============================================================
+        // =============================================================
+        // 12 种主题定义（通过 CSS 变量切换全站配色）
+        // =============================================================
+        const THEMES = [
+            { id: 'spring-bud', num:1, name: '翠芽初春', desc: '清晨茶园 · 现代清新', radius:'16px', previewBg:'#f4f8f5', vars: { '--primary':'#3d8b5a','--primary-light':'#e8f2ec','--primary-dark':'#1f5a3a','--primary-gradient':'linear-gradient(135deg,#3d8b5a 0%,#5ba87a 100%)','--accent-warm':'#e8a040','--bg-body':'#f4f8f5','--bg-card':'#ffffff','--text-primary':'#1a2820','--text-secondary':'#4a6055','--text-muted':'#8aa098','--border-light':'#d8e4dc','--sidebar-bg':'#1a2820' }, swatch:['#3d8b5a','#5ba87a','#e8f2ec','#e8a040'] },
+            { id: 'white-porcelain', num:2, name: '白瓷雅集', desc: '宋代瓷器 · 素净留白', radius:'2px', previewBg:'#faf8f3', vars: { '--primary':'#6b8e7f','--primary-light':'#eef2ee','--primary-dark':'#4a6b5e','--primary-gradient':'linear-gradient(135deg,#6b8e7f 0%,#8aaa9a 100%)','--accent-warm':'#b8956a','--bg-body':'#faf8f3','--bg-card':'#fffefb','--text-primary':'#2a2e26','--text-secondary':'#5a5e54','--text-muted':'#9aa098','--border-light':'#e6e2da','--sidebar-bg':'#2a2e26' }, swatch:['#6b8e7f','#8aaa9a','#eef2ee','#b8956a'] },
+            { id: 'bamboo-grove', num:3, name: '竹海深篁', desc: '安吉竹海 · 深沉材质', radius:'6px', previewBg:'#1f3a2e', vars: { '--primary':'#7a9b6a','--primary-light':'#2a4a3a','--primary-dark':'#1f3a2e','--primary-gradient':'linear-gradient(135deg,#5a7b4a 0%,#7a9b6a 100%)','--accent-warm':'#c4a050','--bg-body':'#1a2a22','--bg-card':'#243a2e','--text-primary':'#e8e8d8','--text-secondary':'#b0b8a0','--text-muted':'#7a8a7a','--border-light':'#3a5a4a','--sidebar-bg':'#14201a' }, swatch:['#5a7b4a','#7a9b6a','#243a2e','#c4a050'], dark:true },
+            { id: 'mountain-stream', num:4, name: '溪涧清泉', desc: '山涧流动 · 圆润错落', radius:'20px', previewBg:'#eaf4f6', vars: { '--primary':'#2a8a9e','--primary-light':'#dcf0f4','--primary-dark':'#1a6a7e','--primary-gradient':'linear-gradient(135deg,#2a8a9e 0%,#4aaab8 100%)','--accent-warm':'#d4a040','--bg-body':'#eaf4f6','--bg-card':'#ffffff','--text-primary':'#0a2a32','--text-secondary':'#3a5a64','--text-muted':'#7a949a','--border-light':'#c8e0e4','--sidebar-bg':'#0a2a32' }, swatch:['#2a8a9e','#4aaab8','#dcf0f4','#d4a040'] },
+            { id: 'zisha-pot', num:5, name: '紫砂古韵', desc: '宜兴紫砂 · 文人厚朴', radius:'4px', previewBg:'#6b3a2e', vars: { '--primary':'#8a5a3a','--primary-light':'#f0e8e0','--primary-dark':'#5a3a24','--primary-gradient':'linear-gradient(135deg,#8a5a3a 0%,#a8784a 100%)','--accent-warm':'#a02020','--bg-body':'#f5f0e8','--bg-card':'#fbf7f0','--text-primary':'#3a2418','--text-secondary':'#5a3a24','--text-muted':'#9a8a7a','--border-light':'#e4dccc','--sidebar-bg':'#3a2418' }, swatch:['#8a5a3a','#a8784a','#f0e8e0','#a02020'] },
+            { id: 'autumn-gold', num:6, name: '秋茶金毫', desc: '秋日丰收 · 报纸分栏', radius:'0', previewBg:'#faf3e0', vars: { '--primary':'#a8782e','--primary-light':'#f5ead0','--primary-dark':'#7a5a1e','--primary-gradient':'linear-gradient(135deg,#a8782e 0%,#c49a3e 100%)','--accent-warm':'#8a4a1e','--bg-body':'#faf3e0','--bg-card':'#fffdf5','--text-primary':'#2a1e08','--text-secondary':'#5a4a2e','--text-muted':'#9a8a6a','--border-light':'#e8d8b8','--sidebar-bg':'#2a1e08' }, swatch:['#a8782e','#c49a3e','#f5ead0','#8a4a1e'] },
+            { id: 'ink-bamboo', num:7, name: '墨竹写意', desc: '文人水墨 · 楷体留白', radius:'2px', previewBg:'#f0e8d0', vars: { '--primary':'#3a3a3a','--primary-light':'#e8e4d8','--primary-dark':'#1a1a1a','--primary-gradient':'linear-gradient(135deg,#3a3a3a 0%,#5a5a5a 100%)','--accent-warm':'#a02020','--bg-body':'#f0e8d0','--bg-card':'#f8f3e4','--text-primary':'#1a1a1a','--text-secondary':'#3a3a3a','--text-muted':'#7a6a5a','--border-light':'#d4ccb8','--sidebar-bg':'#1a1a1a' }, swatch:['#3a3a3a','#5a5a5a','#e8e4d8','#a02020'] },
+            { id: 'black-tea-sunset', num:8, name: '晚霞红茶', desc: '红茶汤色 · 温润包裹', radius:'14px', previewBg:'#fdf0ec', vars: { '--primary':'#8b3a3a','--primary-light':'#f5e0dc','--primary-dark':'#5a2424','--primary-gradient':'linear-gradient(135deg,#8b3a3a 0%,#a85656 100%)','--accent-warm':'#c4882e','--bg-body':'#fdf0ec','--bg-card':'#fffaf8','--text-primary':'#2a1414','--text-secondary':'#5a3434','--text-muted':'#9a7a74','--border-light':'#ecd4cc','--sidebar-bg':'#2a1414' }, swatch:['#8b3a3a','#a85656','#f5e0dc','#c4882e'] },
+            { id: 'night-dew', num:9, name: '夜露凝香', desc: '凌晨采茶 · 静谧深色', radius:'12px', previewBg:'#1a2333', vars: { '--primary':'#5a8a7e','--primary-light':'#2a3a44','--primary-dark':'#3a4a54','--primary-gradient':'linear-gradient(135deg,#4a6a5e 0%,#5a8a7e 100%)','--accent-warm':'#c4a850','--bg-body':'#141c24','--bg-card':'#1e2a34','--text-primary':'#e8eef0','--text-secondary':'#b0bcc0','--text-muted':'#7a8a90','--border-light':'#2a3a44','--sidebar-bg':'#0a141c' }, swatch:['#4a6a5e','#5a8a7e','#1e2a34','#c4a850'], dark:true },
+            { id: 'sakura-tea', num:10, name: '春樱茶会', desc: '日式茶会 · 柔美不对称', radius:'18px', previewBg:'#fdf0f2', vars: { '--primary':'#c47a8e','--primary-light':'#f5e0e4','--primary-dark':'#9a5a6e','--primary-gradient':'linear-gradient(135deg,#c47a8e 0%,#d49aae 100%)','--accent-warm':'#7a9b6a','--bg-body':'#fdf0f2','--bg-card':'#fffafc','--text-primary':'#2a1a1e','--text-secondary':'#5a3a44','--text-muted':'#9a7a84','--border-light':'#e8d0d4','--sidebar-bg':'#3a2428' }, swatch:['#c47a8e','#d49aae','#f5e0e4','#7a9b6a'] },
+            { id: 'aged-white', num:11, name: '老茶陈韵', desc: '老白茶 · 岁月做旧', radius:'6px', previewBg:'#f0e8d8', vars: { '--primary':'#8b6a3e','--primary-light':'#f0e8d0','--primary-dark':'#5a4424','--primary-gradient':'linear-gradient(135deg,#8b6a3e 0%,#a8845a 100%)','--accent-warm':'#4a6b5e','--bg-body':'#f0e8d8','--bg-card':'#f8f2e4','--text-primary':'#2a1e0a','--text-secondary':'#5a4424','--text-muted':'#9a8a6a','--border-light':'#dcccac','--sidebar-bg':'#2a1e0a' }, swatch:['#8b6a3e','#a8845a','#f0e8d0','#4a6b5e'] },
+            { id: 'swiss-modern', num:12, name: '素简当代', desc: '瑞士网格 · 大写极简', radius:'0', previewBg:'#fafafa', vars: { '--primary':'#1a1a1a','--primary-light':'#f0f0f0','--primary-dark':'#000000','--primary-gradient':'linear-gradient(135deg,#1a1a1a 0%,#3a3a3a 100%)','--accent-warm':'#cc2847','--bg-body':'#fafafa','--bg-card':'#ffffff','--text-primary':'#0a0a0a','--text-secondary':'#3a3a3a','--text-muted':'#7a7a7a','--border-light':'#d4d4d4','--sidebar-bg':'#0a0a0a' }, swatch:['#1a1a1a','#3a3a3a','#f0f0f0','#cc2847'] }
+        ];
+
+        function applyTheme(themeId) {
+            const theme = THEMES.find(t => t.id === themeId) || THEMES[0];
+            const root = document.documentElement;
+            Object.entries(theme.vars).forEach(([k, v]) => root.style.setProperty(k, v));
+            // sidebar 背景特殊处理
+            const sidebar = document.querySelector('.sidebar');
+            if (sidebar) sidebar.style.background = theme.vars['--sidebar-bg'];
+            // 切换 body 主题 class（t1-t12），先清除所有 tN class
+            document.body.className = document.body.className.replace(/\bt\d+\b/g, '').trim();
+            document.body.classList.add('t' + theme.num);
+            // 更新激活状态
+            document.querySelectorAll('.theme-card').forEach(c => c.classList.toggle('active', c.dataset.theme === themeId));
+            const statusBadge = document.getElementById('themeStatusBadge');
+            if (statusBadge) statusBadge.textContent = theme.name;
+            localStorage.setItem('tea_theme', themeId);
+        }
+
+        function renderThemeGrid() {
+            const grid = document.getElementById('themeGrid');
+            if (!grid) return;
+            grid.innerHTML = THEMES.map(t => {
+                // 每个卡片预览自己的风格：背景 + 一个迷你 sidebar + 一个迷你卡片
+                const previewBg = t.previewBg || t.vars['--primary-light'];
+                const sidebarBg = t.vars['--sidebar-bg'];
+                const accent = t.vars['--primary'];
+                const lineColor = t.dark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.15)';
+                const lineColor2 = t.dark ? 'rgba(255,255,255,0.25)' : 'rgba(0,0,0,0.10)';
+                return `<div class="theme-card" data-theme="${t.id}">
+                    <div class="theme-preview" style="background:${previewBg};display:flex;align-items:stretch;height:62px;padding:0;">
+                        <div style="width:20px;background:${sidebarBg};"></div>
+                        <div style="flex:1;padding:8px 10px;display:flex;flex-direction:column;justify-content:center;gap:4px;">
+                            <div style="height:10px;width:60%;background:${accent};border-radius:${t.radius||'4px'};"></div>
+                            <div style="height:8px;width:80%;background:${lineColor};border-radius:2px;"></div>
+                            <div style="height:8px;width:50%;background:${lineColor2};border-radius:2px;"></div>
+                        </div>
+                    </div>
+                    <div class="theme-name">${t.name}</div>
+                    <div class="theme-desc">${t.desc}</div>
+                </div>`;
+            }).join('');
+            grid.querySelectorAll('.theme-card').forEach(c => {
+                c.addEventListener('click', () => {
+                    applyTheme(c.dataset.theme);
+                    showToast(`✅ 已切换：${THEMES.find(t => t.id === c.dataset.theme).name}`, 'success');
+                });
+            });
+        }
+
+        function loadApiSettings() {
+            const url = localStorage.getItem('tea_api_url');
+            const model = localStorage.getItem('tea_api_model');
+            const key = localStorage.getItem('tea_api_key');
+            const proxy = localStorage.getItem('tea_proxy_url');
+            const amap = localStorage.getItem('tea_amap_key');
+            if (url) document.getElementById('apiUrl').value = url;
+            if (model) document.getElementById('apiModel').value = model;
+            if (key) document.getElementById('apiKey').value = key;
+            if (proxy) document.getElementById('proxyUrl').value = proxy;
+            if (amap) document.getElementById('amapKey').value = amap;
+            updateStatus();
+            updateAmapStatus();
+        }
+        function saveApiSettings() {
+            const url = document.getElementById('apiUrl').value.trim();
+            const model = document.getElementById('apiModel').value.trim();
+            const key = document.getElementById('apiKey').value.trim();
+            const proxy = document.getElementById('proxyUrl').value.trim();
+            const amap = document.getElementById('amapKey').value.trim();
+            if (!url) return showToast('⚠️ 请填写 API URL', 'error');
+            if (!model) return showToast('⚠️ 请填写模型名称', 'error');
+            if (!proxy) return showToast('⚠️ 请填写代理服务地址', 'error');
+            localStorage.setItem('tea_api_url', url);
+            localStorage.setItem('tea_api_model', model);
+            localStorage.setItem('tea_api_key', key);
+            localStorage.setItem('tea_proxy_url', proxy);
+            localStorage.setItem('tea_amap_key', amap);
+            updateStatus();
+            updateAmapStatus();
+            showToast('✅ 配置已保存（含高德 API Key）', 'success');
+        }
+        async function testApiConnection() {
+            const { apiKey, apiUrl, model, proxyUrl } = getSettings();
+            if (!apiKey) return showToast('⚠️ 请填写 API Key', 'error');
+            if (!proxyUrl) return showToast('⚠️ 请填写代理服务地址', 'error');
+            showToast('🔍 测试连接中…', 'info');
+            try {
+                const response = await fetch(`${proxyUrl}/api/test-connection`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ apiUrl, model, apiKey })
+                });
+                const result = await response.json();
+                const badge = document.getElementById('connStatusBadge');
+                if (result.success) {
+                    showToast(`✅ 连接成功！模型 ${model} 可用`, 'success');
+                    badge.textContent = '✅ 已连接';
+                    badge.style.background = '#e3f5ec';
+                    badge.style.color = 'var(--success)';
+                } else throw new Error(result.error || '连接失败');
+            } catch (error) {
+                showToast('❌ 连接失败: ' + error.message, 'error');
+                const badge = document.getElementById('connStatusBadge');
+                badge.textContent = '❌ 连接失败';
+                badge.style.background = '#fde8e8';
+                badge.style.color = 'var(--danger)';
+            }
+        }
+        function resetApiDefaults() {
+            document.getElementById('apiUrl').value = 'https://api.deepseek.com/v1/chat/completions';
+            document.getElementById('apiModel').value = 'deepseek-v4-flash-vision-exp';
+            document.getElementById('apiKey').value = '';
+            document.getElementById('proxyUrl').value = 'http://localhost:3000';
+            document.getElementById('amapKey').value = '';
+            localStorage.removeItem('tea_api_url');
+            localStorage.removeItem('tea_api_model');
+            localStorage.removeItem('tea_api_key');
+            localStorage.removeItem('tea_proxy_url');
+            localStorage.removeItem('tea_amap_key');
+            updateStatus();
+            updateAmapStatus();
+            showToast('↺ 已恢复默认配置', 'info');
+        }
+        function updateAmapStatus() {
+            const amap = document.getElementById('amapKey').value.trim();
+            const badge = document.getElementById('amapStatusBadge');
+            if (amap) { badge.textContent = '✅ 已配置'; badge.style.background = '#e3f5ec'; badge.style.color = 'var(--success)'; }
+            else { badge.textContent = '未配置'; badge.style.background = 'var(--primary-light)'; badge.style.color = 'var(--primary)'; }
+        }
+        function updateStatus() {
+            const key = document.getElementById('apiKey').value.trim();
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            const time = document.getElementById('statusTime');
+            if (key) { dot.className = 'dot green'; text.textContent = '✅ API Key 已配置'; }
+            else { dot.className = 'dot gray'; text.textContent = '⚠️ 未配置 API Key'; }
+            time.textContent = '更新于 ' + new Date().toLocaleTimeString('zh-CN', { hour12: false });
+        }
+        document.getElementById('saveApiBtn').addEventListener('click', saveApiSettings);
+        document.getElementById('testConnBtn').addEventListener('click', testApiConnection);
+        document.getElementById('resetDefaultsBtn').addEventListener('click', resetApiDefaults);
+        document.getElementById('apiKey').addEventListener('input', updateStatus);
+        document.getElementById('amapKey').addEventListener('input', updateAmapStatus);
+
+        // 报告标签页切换
+        document.querySelectorAll('#reportTabs .tab').forEach(t => {
+            t.addEventListener('click', () => renderReport(t.dataset.range));
+        });
+
+        // 农事日历翻页
+        const calPrev = document.getElementById('calPrev');
+        const calNext = document.getElementById('calNext');
+        if (calPrev) calPrev.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        });
+        if (calNext) calNext.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
+        });
+
+        // =============================================================
+        // 初始化
+        // =============================================================
+        async function init() {
+            loadApiSettings();
+            renderZones();
+            renderSensors();
+            renderAlertTimeline();
+            renderDiseaseLibrary();
+            renderPresets();
+            renderDecisionHistory();
+            renderReport();
+            renderDevices();
+            renderCalendar();
+            renderThemeGrid();
+            // 应用保存的主题（无保存则默认翠绿茶园）
+            applyTheme(localStorage.getItem('tea_theme') || 'tea-green');
+            await getLocationAndWeather();
+            // 趋势图表在页面可见后延迟绘制（canvas 需要宽度）
+            setTimeout(renderTrends, 400);
+            // 每分钟自动刷新（仅页面可见时）
+            setInterval(() => { if (!document.hidden) getLocationAndWeather(); }, 60000);
+            console.log('🍵 茶智管 启动完成 | 12 主题可选 | 高德地图需用户填 Key | DeepSeek 真实调用');
+            console.log('🤖 默认模型: deepseek-v4-flash-vision-exp');
+            console.log('📡 请先启动后端代理: cd server && npm start');
+        }
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
